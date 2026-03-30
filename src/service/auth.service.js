@@ -18,6 +18,7 @@ export async function login({ email, password }) {
     )
 
     const response = await response_http.json()
+    if (!response_http.ok) throw new Error(response.message || 'Error al iniciar sesión')
     return response
 }
 
@@ -38,7 +39,9 @@ export async function register({ user_name, email, password }) {
             )
         }
     )
-    return await response_http.json()
+    const response = await response_http.json()
+    if (!response_http.ok) throw new Error(response.message || 'Error al registrarse')
+    return response
 }
 
 export async function resetPasswordRequest({ email }) {
@@ -56,5 +59,7 @@ export async function resetPasswordRequest({ email }) {
             )
         }
     )
-    return await response_http.json()
+    const response = await response_http.json()
+    if (!response_http.ok) throw new Error(response.message || 'Error al solicitar restablecimiento de contraseña')
+    return response
 }
