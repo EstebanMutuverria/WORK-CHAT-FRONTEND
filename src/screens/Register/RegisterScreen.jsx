@@ -4,6 +4,8 @@ import useRequest from '../../hooks/useRequest.jsx'
 import useForm from '../../hooks/useForm.jsx'
 import { register } from '../../service/auth.service.js'
 import '../../styles/auth.css'
+import { FaEye } from "react-icons/fa";
+import { showPassword } from '../../helpers/showPassword.helper.js'
 
 const RegisterScreen = () => {
   const REGISTER_FORM_FIELDS = {
@@ -59,6 +61,8 @@ const RegisterScreen = () => {
     },
     [response]
   )
+
+  // showPassword(REGISTER_FORM_FIELDS.password) // REMOVED: This causes error because the DOM is not ready yet during render
 
   return (
     <div className="auth-page">
@@ -116,17 +120,22 @@ const RegisterScreen = () => {
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor={REGISTER_FORM_FIELDS.password}>Contraseña</label>
-              <input
-                className="form-input"
-                type="password"
-                id={REGISTER_FORM_FIELDS.password}
-                name={REGISTER_FORM_FIELDS.password}
-                placeholder="••••••••"
-                onChange={handleChangeInput}
-                value={formState[REGISTER_FORM_FIELDS.password]}
-                autoComplete="new-password"
-                required
-              />
+              <div className='form-input-eyebtn-container'>
+                <input
+                  className="form-input"
+                  type="password"
+                  id={REGISTER_FORM_FIELDS.password}
+                  name={REGISTER_FORM_FIELDS.password}
+                  placeholder="••••••••"
+                  onChange={handleChangeInput}
+                  value={formState[REGISTER_FORM_FIELDS.password]}
+                  autoComplete="new-password"
+                  required
+                />
+                <button type='button' onClick={() => showPassword(REGISTER_FORM_FIELDS.password)}>
+                  <FaEye />
+                </button>
+              </div>
             </div>
             <button
               className={`btn btn--primary${loading ? ' btn--loading' : ''}`}

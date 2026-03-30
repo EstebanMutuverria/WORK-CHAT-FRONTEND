@@ -5,6 +5,8 @@ import { login } from '../../service/auth.service'
 import useForm from '../../hooks/useForm'
 import { AuthContext } from '../../context/AuthContext'
 import '../../styles/auth.css'
+import { FaEye } from "react-icons/fa";
+import { showPassword } from '../../helpers/showPassword.helper'
 
 const LoginScreen = () => {
 
@@ -66,6 +68,8 @@ const LoginScreen = () => {
     [response]
   )
 
+  // showPassword(LOGIN_FORM_FIELDS.PASSWORD) // REMOVED: This causes error because the DOM is not ready yet during render
+
   return (
     <div className="auth-page">
       <div className="auth-card">
@@ -103,17 +107,22 @@ const LoginScreen = () => {
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor={LOGIN_FORM_FIELDS.PASSWORD}>Contraseña</label>
-            <input
-              className="form-input"
-              type="password"
-              id={LOGIN_FORM_FIELDS.PASSWORD}
-              name={LOGIN_FORM_FIELDS.PASSWORD}
-              placeholder="••••••••"
-              onChange={handleChangeInput}
-              value={formState[LOGIN_FORM_FIELDS.PASSWORD]}
-              autoComplete="current-password"
-              required
-            />
+            <div className='form-input-eyebtn-container'>
+              <input
+                className="form-input"
+                type="password"
+                id={LOGIN_FORM_FIELDS.PASSWORD}
+                name={LOGIN_FORM_FIELDS.PASSWORD}
+                placeholder="••••••••"
+                onChange={handleChangeInput}
+                value={formState[LOGIN_FORM_FIELDS.PASSWORD]}
+                autoComplete="current-password"
+                required
+              />
+              <button type='button' onClick={() => showPassword(LOGIN_FORM_FIELDS.PASSWORD)}>
+                <FaEye />
+              </button>
+            </div>
           </div>
           <button
             className={`btn btn--primary${loading ? ' btn--loading' : ''}`}
