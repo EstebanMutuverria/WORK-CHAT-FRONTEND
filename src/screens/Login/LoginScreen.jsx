@@ -66,8 +66,6 @@ const LoginScreen = () => {
     [response]
   )
 
-  console.log(error)
-
   return (
     <div className="auth-page">
       <div className="auth-card">
