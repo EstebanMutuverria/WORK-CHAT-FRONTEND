@@ -1,0 +1,116 @@
+/* ============================================================
+   HOME SCREEN STYLES
+   Pantalla principal: listado de espacios de trabajo
+   ============================================================ */
+
+.home-page {
+  min-height: 100vh;
+  background: var(--color-bg-base);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hero / encabezado */
+.home-hero {
+  padding: var(--space-16) var(--space-6) var(--space-8);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  animation: fadein-up 0.4s ease both;
+}
+
+.home-hero__title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  letter-spacing: -1px;
+  margin-bottom: var(--space-4);
+}
+
+.home-hero__subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Grid de tarjetas de workspace */
+.workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-6) var(--space-16);
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadein-up 0.4s ease 0.1s both;
+}
+
+/* Tarjeta de workspace */
+.workspace-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base),
+    transform var(--transition-base);
+  cursor: default;
+}
+
+.workspace-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.workspace-card__icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-secondary));
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+.workspace-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.workspace-card__name {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workspace-card__meta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+
+/* ──────────────────────────────────────────────
+   Responsive — mobile
+   ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .home-hero__title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .workspace-grid {
+    grid-template-columns: 1fr;
+    padding: var(--space-4) var(--space-4) var(--space-8);
+  }
+}

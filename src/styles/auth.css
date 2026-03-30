@@ -1,0 +1,93 @@
+/* ============================================================
+   AUTH SHARED STYLES
+   Compartido por: LoginScreen, RegisterScreen,
+                   ResetPasswordRequestScreen
+   ============================================================ */
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(74, 21, 75, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(29, 155, 209, 0.15) 0%, transparent 50%),
+    var(--color-bg-base);
+  padding: var(--space-6);
+  animation: fadein-up 0.5s ease both;
+}
+
+/* Tarjeta central */
+.auth-card {
+  width: 100%;
+  max-width: var(--auth-card-width);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10) var(--space-8);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Bloque logo + nombre de app */
+.auth-card__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.auth-card__logo {
+  width: 44px;
+  height: 44px;
+  background: var(--color-brand-primary);
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  box-shadow: var(--shadow-md);
+}
+
+.auth-card__app-name {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  letter-spacing: -0.5px;
+}
+
+/* Encabezado del formulario */
+.auth-card__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.auth-card__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: var(--line-height-relaxed);
+  margin-top: var(--space-2);
+}
+
+
+/* ──────────────────────────────────────────────
+   Responsive — mobile
+   ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  :root {
+    --auth-card-width: 100%;
+  }
+
+  .auth-card {
+    padding: var(--space-8) var(--space-5);
+    border-radius: var(--radius-lg);
+  }
+
+  .auth-card__title {
+    font-size: var(--font-size-xl);
+  }
+}
