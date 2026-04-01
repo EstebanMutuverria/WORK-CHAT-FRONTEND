@@ -40,6 +40,10 @@ const HomeScreen = () => {
                     <div className="home-hero">
                         <h1 className="home-hero__title">Bienvenido 👋</h1>
                         <p className="home-hero__subtitle">Seleccioná el espacio de trabajo al que querés acceder.</p>
+                        <br />
+                        <Link className="btn btn--primary" style={{ width: 'auto' }} to="/create-workspace">
+                            Crear espacio de trabajo
+                        </Link>
                     </div>
 
                     <div className="workspace-grid">
