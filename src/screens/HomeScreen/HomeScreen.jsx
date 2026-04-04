@@ -47,7 +47,7 @@ const HomeScreen = () => {
                     </div>
 
                     <div className="workspace-grid">
-                        {response.data.workspacesList.map(
+                        {workspaces.map(
                             (workspace) => (
                                 <div className="workspace-card" key={workspace.workspace_id}>
                                     <div className="workspace-card__icon">🏢</div>
