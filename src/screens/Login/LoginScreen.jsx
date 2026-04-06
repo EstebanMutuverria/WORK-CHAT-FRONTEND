@@ -5,7 +5,7 @@ import { login } from '../../service/auth.service'
 import useForm from '../../hooks/useForm'
 import { AuthContext } from '../../context/AuthContext'
 import '../../styles/auth.css'
-import { FaEye } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { showPassword } from '../../helpers/showPassword.helper'
 
 const LoginScreen = () => {
@@ -67,8 +67,6 @@ const LoginScreen = () => {
     },
     [response]
   )
-
-  // showPassword(LOGIN_FORM_FIELDS.PASSWORD) // REMOVED: This causes error because the DOM is not ready yet during render
 
   return (
     <div className="auth-page">
