@@ -5,6 +5,7 @@ import RegisterScreen from "./screens/Register/RegisterScreen"
 import ResetPasswordRequestScreen from "./screens/ResetPasswordRequestScreen/ResetPasswordRequestScreen"
 import AuthMiddleware from "./Middlewares/AuthMiddleware"
 import CreateWorkspaceScreen from "./screens/CreateWorkspaceScreen/CreateWorkspaceScreen"
+import WorkspaceScreen from "./screens/Workspace/WorkspaceScreen"
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
       <Route element={<AuthMiddleware />}>
         <Route path="/home" element={<HomeScreen />} />
         <Route path="/create-workspace" element={<CreateWorkspaceScreen />} />
+        <Route path="/workspaces/:workspace_id" element={<WorkspaceScreen />} />
       </Route>
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/register" element={<RegisterScreen />} />

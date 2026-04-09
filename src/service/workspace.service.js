@@ -36,3 +36,18 @@ export async function createWorkspace({ title, description, url_image }) {
     console.log(response)
     return response
 }
+
+export async function getWorkspaceById({ workspace_id }) {
+    const response_http = await fetch(
+        ENVIRONMENT.API_URL + '/api/workspaces/' + workspace_id,
+        {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem(LOCALSTORAGE_TOKEN_KEY)
+            }
+        }
+    )
+    const response = await response_http.json()
+    console.log(response)
+    return response
+}
