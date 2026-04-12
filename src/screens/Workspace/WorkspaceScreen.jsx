@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router'
 import useRequest from '../../hooks/useRequest'
 import { getWorkspaceById } from '../../service/workspace.service.js'
@@ -6,8 +6,8 @@ import './WorkspaceScreen.css'
 import { getChannelsByWorkspaceId } from '../../service/channel.service.js'
 
 const WorkspaceScreen = () => {
-
     const { workspace_id } = useParams()
+    const [isSidebarVisible, setIsSidebarVisible] = useState(true)
 
     const {
         sendRequest,
@@ -38,6 +38,22 @@ const WorkspaceScreen = () => {
         },
         [workspace_id]
     )
+
+    // Automatically hide sidebar on small screens on initial load
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                setIsSidebarVisible(false)
+            } else {
+                setIsSidebarVisible(true)
+            }
+        }
+        handleResize() // Set initial state
+        // We don't necessarily want to toggle it every time window resizes if user manually changed it, 
+        // but for a first implementation this is fine.
+    }, [])
+
+    const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible)
 
     if (loading) {
         return (
@@ -70,16 +86,19 @@ const WorkspaceScreen = () => {
     const channels = response?.data?.channels || []
 
     return (
-        <div className="workspace-layout">
+        <div className={`workspace-layout ${!isSidebarVisible ? 'sidebar-hidden' : ''}`}>
+            {/* SIDEBAR OVERLAY (Mobile) */}
+            {isSidebarVisible && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
+
             {/* SIDEBAR */}
-            <aside className="workspace-sidebar">
+            <aside className={`workspace-sidebar ${isSidebarVisible ? 'visible' : ''}`}>
                 <div className="workspace-sidebar__header">
                     <h1 className="workspace-sidebar__title">
                         {workspace ? workspace.workspace_title : 'Cargando...'}
                     </h1>
-                    <div className="sidebar-header__icon" style={{ opacity: 0.5 }}>
+                    <div className="sidebar-header__icon" style={{ opacity: 0.5 }} onClick={toggleSidebar}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="m6 9 6 6 6-6" />
+                            <path d="M18 6L6 18M6 6l12 12" />
                         </svg>
                     </div>
                 </div>
@@ -96,6 +115,7 @@ const WorkspaceScreen = () => {
                                     to={`/workspace/${workspace_id}/channel/${channel._id}`}
                                     key={channel._id}
                                     className={`sidebar-item ${index === 0 ? 'sidebar-item--active' : ''}`}
+                                    onClick={() => window.innerWidth < 768 && setIsSidebarVisible(false)}
                                 >
                                     <span className="sidebar-item__icon">#</span>
                                     <span>{channel.title}</span>
@@ -111,7 +131,7 @@ const WorkspaceScreen = () => {
                         </div>
                         <div className="sidebar-list">
                             {members.map(member => (
-                                <div className="sidebar-item" key={member.id || member.user_id}>
+                                <div className="sidebar-item" key={member.member_id}>
                                     <div className="sidebar-item__avatar-wrapper">
                                         <div className="sidebar-item__avatar">
                                             {(member.user_name ? member.user_name[0] : 'U').toUpperCase()}
@@ -130,52 +150,78 @@ const WorkspaceScreen = () => {
             {/* MAIN CHAT */}
             <main className="workspace-main">
                 <header className="chat-header">
-                    <h2 className="chat-header__title">
-                        <span>#</span> general
-                        {workspace?.workspace_description && (
-                            <span className="chat-header__subtitle">
-                                {workspace.workspace_description}
-                            </span>
-                        )}
-                    </h2>
+                    <button className="sidebar-toggle-btn" onClick={toggleSidebar} aria-label="Toggle Sidebar">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    {
+                        channels.map(channel => (
+                            <h2 className="chat-header__title">
+                                <span>#</span> {channel.title}
+                                {channel?.channel_description && (
+                                    <span className="chat-header__subtitle">
+                                        {channel.channel_description}
+                                    </span>
+                                )}
+                            </h2>
+                        ))
+                    }
                 </header>
+                {
+                    channels.length === 0 &&
+                    <div className="chat-without-channels">
+                        <p className="chat-messages__empty-text">No hay canales en este espacio de trabajo</p>
+                        <Link className="btn btn--primary create-channel-btn" to={`/workspace/${workspace_id}/channel/create`}>
+                            Crear canal
+                        </Link>
+                    </div>
 
-                {channels.map(channel => (
-                    <div className="chat-messages" key={channel._id}>
-                        <div className="chat-messages__empty">
-                            <div className="chat-messages__empty-icon">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                </svg>
+                }
+                {
+                    channels.length > 0 &&
+                    <>
+                        {channels.map(channel => (
+                            <div className="chat-messages" key={channel._id}>
+                                <div className="chat-messages__empty">
+                                    <div className="chat-messages__empty-icon">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                        </svg>
+                                    </div>
+                                    <div className="chat-messages__empty-text">
+                                        <strong>Bienvenido a #{channel.title}</strong>
+                                        <p>
+                                            Este es el comienzo de la historia de este canal.
+                                            Úsalo para comunicarte con tu equipo, compartir ideas y colaborar.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="chat-messages__empty-text">
-                                <strong>Bienvenido a #{channel.title}</strong>
-                                <p>
-                                    Este es el comienzo de la historia de este canal.
-                                    Úsalo para comunicarte con tu equipo, compartir ideas y colaborar.
-                                </p>
+                        ))}
+
+                        <div className="chat-input-container">
+                            <div className="chat-input-wrapper">
+                                <textarea
+                                    className="chat-input"
+                                    placeholder="Escribe un mensaje en #general"
+                                    rows={1}
+                                ></textarea>
+                                <div className="chat-input-actions">
+                                    <button className="btn-send">
+                                        Enviar
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
-
-                <div className="chat-input-container">
-                    <div className="chat-input-wrapper">
-                        <textarea
-                            className="chat-input"
-                            placeholder="Escribe un mensaje en #general"
-                            rows={1}
-                        ></textarea>
-                        <div className="chat-input-actions">
-                            <button className="btn-send">
-                                Enviar
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                    </>
+                }
             </main>
         </div>
     )
 }
 
 export default WorkspaceScreen
+Screen

@@ -9,13 +9,13 @@
   overflow: hidden;
   background-color: var(--color-bg-base, #111113);
   animation: workspace-fade-in 0.4s ease-out;
+  position: relative;
 }
 
 @keyframes workspace-fade-in {
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
@@ -27,19 +27,27 @@
 .workspace-sidebar {
   width: var(--sidebar-width, 260px);
   background-color: #0d0d0f;
-  /* Even darker for professional contrast */
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   border-right: 1px solid rgba(255, 255, 255, 0.04);
   justify-content: space-between;
   padding-bottom: 10px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+}
+
+/* Hidden state for desktop (Push) */
+.sidebar-hidden .workspace-sidebar {
+  margin-left: calc(var(--sidebar-width, 260px) * -1);
 }
 
 .aside {
   margin: 10px;
   width: 90%;
   text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .workspace-sidebar__header {
@@ -89,6 +97,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.btn-add-item {
+  background: transparent;
+  border: none;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.btn-add-item:hover {
+  opacity: 1;
 }
 
 .sidebar-list {
@@ -175,8 +194,8 @@
   flex-direction: column;
   min-width: 0;
   background-color: #1a1d21;
-  /* Slightly lighter than sidebar */
   position: relative;
+  transition: padding-left 0.3s ease;
 }
 
 .chat-header {
@@ -188,6 +207,26 @@
   background-color: rgba(26, 29, 33, 0.8);
   backdrop-filter: blur(10px);
   z-index: 10;
+  gap: var(--space-3, 12px);
+}
+
+.sidebar-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  opacity: 0.6;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .chat-header__title {
@@ -242,6 +281,7 @@
   color: rgba(255, 255, 255, 0.8);
   font-size: 15px;
   line-height: 1.6;
+  text-align: center;
 }
 
 .chat-messages__empty-text strong {
@@ -249,6 +289,29 @@
   font-size: 20px;
   display: block;
   margin-bottom: 8px;
+}
+
+.chat-without-channels {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  gap: 24px;
+  align-items: center;
+  flex: 1;
+  padding: var(--space-6, 24px);
+}
+
+.chat-without-channels .chat-messages__empty-text {
+    font-size: 18px;
+    opacity: 0.7;
+}
+
+.create-channel-btn {
+  width: auto !important;
+  min-width: 200px;
+  max-width: 300px;
 }
 
 /* Premium Chat Input */
@@ -315,8 +378,60 @@
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
 }
 
-.btn-send:active {
-  transform: translateY(0);
+/* ──────────────────────────────────────────────
+   RESPONSIVENESS & MOBILE OVERLAY
+   ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .workspace-sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .workspace-sidebar.visible {
+    transform: translateX(0);
+  }
+
+  .sidebar-hidden .workspace-sidebar {
+    margin-left: 0; /* Override desktop hidden margin */
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 90;
+    animation: fade-in 0.2s ease;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .chat-header {
+    padding: 0 16px;
+  }
+
+  .chat-input-container {
+    padding: 0 12px 12px;
+  }
+
+  .chat-messages {
+    padding: 16px;
+  }
+
+  .chat-header__subtitle {
+    display: none; /* Hide on small screens to save space */
+  }
+
+  .create-channel-btn {
+    width: 100% !important;
+  }
 }
 
 /* Custom Scrollbar for a cleaner look */
