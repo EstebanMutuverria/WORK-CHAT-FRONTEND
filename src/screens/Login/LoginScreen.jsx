@@ -5,8 +5,7 @@ import { login } from '../../service/auth.service'
 import useForm from '../../hooks/useForm'
 import { AuthContext } from '../../context/AuthContext'
 import '../../styles/auth.css'
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { showPassword } from '../../helpers/showPassword.helper'
+import PasswordField from '../../components/Form/PasswordField'
 
 const LoginScreen = () => {
 
@@ -105,22 +104,12 @@ const LoginScreen = () => {
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor={LOGIN_FORM_FIELDS.PASSWORD}>Contraseña</label>
-            <div className='form-input-eyebtn-container'>
-              <input
-                className="form-input"
-                type="password"
-                id={LOGIN_FORM_FIELDS.PASSWORD}
-                name={LOGIN_FORM_FIELDS.PASSWORD}
-                placeholder="••••••••"
-                onChange={handleChangeInput}
-                value={formState[LOGIN_FORM_FIELDS.PASSWORD]}
-                autoComplete="current-password"
-                required
-              />
-              <button type='button' onClick={() => showPassword(LOGIN_FORM_FIELDS.PASSWORD)}>
-                <FaEye />
-              </button>
-            </div>
+            <PasswordField
+              id={LOGIN_FORM_FIELDS.PASSWORD}
+              value={formState[LOGIN_FORM_FIELDS.PASSWORD]}
+              onChange={handleChangeInput}
+              autoComplete="current-password"
+            />
           </div>
           <button
             className={`btn btn--primary${loading ? ' btn--loading' : ''}`}
