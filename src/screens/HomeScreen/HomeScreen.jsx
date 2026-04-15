@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { Link } from 'react-router'
 import useWorkSpaces from '../../hooks/useWorkspaces.jsx'
+import ENVIRONMENT from '../../config/environment.config.js'
 import './HomeScreen.css'
 
 const HomeScreen = () => {
@@ -11,6 +12,16 @@ const HomeScreen = () => {
         error,
         workspaces
     } = useWorkSpaces()
+
+    const getInitials = (title) => {
+        if (!title) return '?'
+        return title
+            .split(' ')
+            .map(word => word[0])
+            .join('')
+            .slice(0, 2)
+            .toUpperCase()
+    }
 
     return (
         <div className="home-page">
@@ -50,7 +61,19 @@ const HomeScreen = () => {
                         {workspaces.map(
                             (workspace) => (
                                 <div className="workspace-card" key={workspace.workspace_id}>
-                                    <div className="workspace-card__icon">🏢</div>
+                                    <div className="workspace-card__icon">
+                                        {workspace.workspace_image ? (
+                                            <img
+                                                src={ENVIRONMENT.API_URL + workspace.workspace_image}
+                                                alt={workspace.workspace_title}
+                                                className="workspace-card__img"
+                                            />
+                                        ) : (
+                                            <div className="workspace-card__initials">
+                                                {getInitials(workspace.workspace_title)}
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="workspace-card__body">
                                         <h2 className="workspace-card__name">{workspace.workspace_title}</h2>
                                         <p className="workspace-card__meta">Espacio de trabajo</p>

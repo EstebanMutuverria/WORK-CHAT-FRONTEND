@@ -12,28 +12,28 @@ export async function getWorkspaces() {
         }
     )
     const response = await response_http.json()
-    console.log(response)
     return response
 }
 
-export async function createWorkspace({ title, description, url_image }) {
+export async function createWorkspace({ title, description, image }) {
+    const formData = new FormData()
+    formData.append('title', title)
+    formData.append('description', description)
+    if (image) {
+        formData.append('image', image)
+    }
+
     const response_http = await fetch(
         ENVIRONMENT.API_URL + '/api/workspaces',
         {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem(LOCALSTORAGE_TOKEN_KEY),
-                'Content-Type': 'application/json'
+                'Authorization': 'Bearer ' + localStorage.getItem(LOCALSTORAGE_TOKEN_KEY)
             },
-            body: JSON.stringify({
-                title,
-                description,
-                url_image
-            })
+            body: formData
         }
     )
     const response = await response_http.json()
-    console.log(response)
     return response
 }
 
@@ -48,6 +48,5 @@ export async function getWorkspaceById({ workspace_id }) {
         }
     )
     const response = await response_http.json()
-    console.log(response)
     return response
 }
