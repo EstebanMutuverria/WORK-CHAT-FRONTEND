@@ -12,7 +12,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<LoginScreen />} />
+      <Route path="/" element={<HomeScreen />} />
       <Route element={<AuthMiddleware />}>
         <Route path="/home" element={<HomeScreen />} />
         <Route path="/create-workspace" element={<CreateWorkspaceScreen />} />
