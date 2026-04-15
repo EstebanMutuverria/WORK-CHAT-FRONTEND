@@ -12,8 +12,8 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<HomeScreen />} />
       <Route element={<AuthMiddleware />}>
+        <Route path="/" element={<HomeScreen />} />
         <Route path="/home" element={<HomeScreen />} />
         <Route path="/create-workspace" element={<CreateWorkspaceScreen />} />
         <Route path="/workspaces/:workspace_id" element={<WorkspaceScreen />} />
