@@ -6,7 +6,7 @@ import './WorkspaceScreen.css'
 import { getChannelsByWorkspaceId } from '../../service/channel.service.js'
 
 const WorkspaceScreen = () => {
-    const { workspace_id } = useParams()
+    const { workspace_id, channel_id } = useParams()
     const [isSidebarVisible, setIsSidebarVisible] = useState(true)
 
     const {
@@ -85,6 +85,9 @@ const WorkspaceScreen = () => {
     const members = response?.data?.members || []
     const channels = response?.data?.channels || []
 
+    const selectedChannel = channels.find(channel => channel._id === channel_id) || channels[0]
+
+
     return (
         <div className={`workspace-layout ${!isSidebarVisible ? 'sidebar-hidden' : ''}`}>
             {/* SIDEBAR OVERLAY (Mobile) */}
@@ -107,14 +110,14 @@ const WorkspaceScreen = () => {
                     <div className="sidebar-section">
                         <div className="sidebar-section__title">
                             <span>Canales</span>
-                            <button className="btn-add-item" style={{ color: 'inherit', fontSize: '18px', cursor: 'pointer' }}>+</button>
+                            <Link to={`/workspaces/${workspace_id}/create-channel`} className="btn-add-item" style={{ color: 'inherit', fontSize: '18px', cursor: 'pointer' }}>+</Link>
                         </div>
                         <div className="sidebar-list">
-                            {channels.map((channel, index) => (
+                            {channels.map((channel) => (
                                 <Link
-                                    to={`/workspace/${workspace_id}/channel/${channel._id}`}
+                                    to={`/workspaces/${workspace_id}/${channel._id}`}
                                     key={channel._id}
-                                    className={`sidebar-item ${index === 0 ? 'sidebar-item--active' : ''}`}
+                                    className={`sidebar-item ${selectedChannel?._id === channel._id ? 'sidebar-item--active' : ''}`}
                                     onClick={() => window.innerWidth < 768 && setIsSidebarVisible(false)}
                                 >
                                     <span className="sidebar-item__icon">#</span>
@@ -149,42 +152,35 @@ const WorkspaceScreen = () => {
 
             {/* MAIN CHAT */}
             <main className="workspace-main">
-                <header className="chat-header">
-                    <button className="sidebar-toggle-btn" onClick={toggleSidebar} aria-label="Toggle Sidebar">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    </button>
-                    {
-                        channels.map(channel => (
+                    <header className="chat-header">
+                        <button className="sidebar-toggle-btn" onClick={toggleSidebar} aria-label="Toggle Sidebar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        </button>
+                        {selectedChannel && (
                             <h2 className="chat-header__title">
-                                <span>#</span> {channel.title}
-                                {channel?.channel_description && (
+                                <span>#</span> {selectedChannel.title}
+                                {selectedChannel?.channel_description && (
                                     <span className="chat-header__subtitle">
-                                        {channel.channel_description}
+                                        {selectedChannel.channel_description}
                                     </span>
                                 )}
                             </h2>
-                        ))
-                    }
-                </header>
-                {
-                    channels.length === 0 &&
-                    <div className="chat-without-channels">
-                        <p className="chat-messages__empty-text">No hay canales en este espacio de trabajo</p>
-                        <Link className="btn btn--primary create-channel-btn" to={`/workspace/${workspace_id}/channel/create`}>
-                            Crear canal
-                        </Link>
-                    </div>
-
-                }
-                {
-                    channels.length > 0 &&
-                    <>
-                        {channels.map(channel => (
-                            <div className="chat-messages" key={channel._id}>
+                        )}
+                    </header>
+                    {
+                        channels.length === 0 ? (
+                            <div className="chat-without-channels">
+                                <p className="chat-messages__empty-text">No hay canales en este espacio de trabajo</p>
+                                <Link className="btn btn--primary create-channel-btn" to={`/workspaces/${workspace_id}/create-channel`}>
+                                    Crear canal
+                                </Link>
+                            </div>
+                        ) : selectedChannel ? (
+                            <div className="chat-messages" key={selectedChannel._id}>
                                 <div className="chat-messages__empty">
                                     <div className="chat-messages__empty-icon">
                                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -192,7 +188,7 @@ const WorkspaceScreen = () => {
                                         </svg>
                                     </div>
                                     <div className="chat-messages__empty-text">
-                                        <strong>Bienvenido a #{channel.title}</strong>
+                                        <strong>Bienvenido a #{selectedChannel.title}</strong>
                                         <p>
                                             Este es el comienzo de la historia de este canal.
                                             Úsalo para comunicarte con tu equipo, compartir ideas y colaborar.
@@ -200,13 +196,15 @@ const WorkspaceScreen = () => {
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                        ) : null
+                    }
 
+                    {channels.length > 0 && (
                         <div className="chat-input-container">
                             <div className="chat-input-wrapper">
                                 <textarea
                                     className="chat-input"
-                                    placeholder="Escribe un mensaje en #general"
+                                    placeholder={`Escribe un mensaje en #${selectedChannel?.title || ''}`}
                                     rows={1}
                                 ></textarea>
                                 <div className="chat-input-actions">
@@ -216,8 +214,7 @@ const WorkspaceScreen = () => {
                                 </div>
                             </div>
                         </div>
-                    </>
-                }
+                    )}
             </main>
         </div>
     )

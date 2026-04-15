@@ -6,6 +6,7 @@ import ResetPasswordRequestScreen from "./screens/ResetPasswordRequestScreen/Res
 import AuthMiddleware from "./Middlewares/AuthMiddleware"
 import CreateWorkspaceScreen from "./screens/CreateWorkspaceScreen/CreateWorkspaceScreen"
 import WorkspaceScreen from "./screens/Workspace/WorkspaceScreen"
+import CreateChannelScreen from "./screens/CreateChannelScreen/CreateChannelScreen"
 
 function App() {
 
@@ -16,6 +17,8 @@ function App() {
         <Route path="/home" element={<HomeScreen />} />
         <Route path="/create-workspace" element={<CreateWorkspaceScreen />} />
         <Route path="/workspaces/:workspace_id" element={<WorkspaceScreen />} />
+        <Route path="/workspaces/:workspace_id/:channel_id" element={<WorkspaceScreen />} />
+        <Route path="/workspaces/:workspace_id/create-channel" element={<CreateChannelScreen />} />
       </Route>
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/register" element={<RegisterScreen />} />
