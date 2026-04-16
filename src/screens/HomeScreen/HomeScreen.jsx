@@ -33,7 +33,7 @@ const HomeScreen = () => {
                 </div>
             )}
 
-            {!loading && response && response.ok && workspaces.length === 0 && (
+            {!loading && response && response.ok && (workspaces?.length || 0) === 0 && (
                 <div className="empty-state">
                     <div className="empty-state__icon">🏢</div>
                     <h2 className="empty-state__title">No tenés espacios de trabajo</h2>
@@ -46,7 +46,7 @@ const HomeScreen = () => {
                 </div>
             )}
 
-            {!loading && response && response.ok && workspaces.length > 0 && (
+            {!loading && response && response.ok && (workspaces?.length || 0) > 0 && (
                 <>
                     <div className="home-hero">
                         <h1 className="home-hero__title">Bienvenido 👋</h1>
