@@ -1,14 +1,11 @@
 import ENVIRONMENT from "../config/environment.config.js";
-import { LOCALSTORAGE_TOKEN_KEY } from "../context/AuthContext";
+import { authenticatedFetch } from "../helpers/authenticatedFetch";
 
 export async function getWorkspaces() {
-    const response_http = await fetch(
+    const response_http = await authenticatedFetch(
         ENVIRONMENT.API_URL + '/api/workspaces',
         {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem(LOCALSTORAGE_TOKEN_KEY)
-            }
+            method: 'GET'
         }
     )
     const response = await response_http.json()
@@ -23,13 +20,10 @@ export async function createWorkspace({ title, description, image }) {
         formData.append('image', image)
     }
 
-    const response_http = await fetch(
+    const response_http = await authenticatedFetch(
         ENVIRONMENT.API_URL + '/api/workspaces',
         {
             method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem(LOCALSTORAGE_TOKEN_KEY)
-            },
             body: formData
         }
     )
@@ -38,13 +32,10 @@ export async function createWorkspace({ title, description, image }) {
 }
 
 export async function getWorkspaceById({ workspace_id }) {
-    const response_http = await fetch(
+    const response_http = await authenticatedFetch(
         ENVIRONMENT.API_URL + '/api/workspaces/' + workspace_id,
         {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem(LOCALSTORAGE_TOKEN_KEY)
-            }
+            method: 'GET'
         }
     )
     const response = await response_http.json()

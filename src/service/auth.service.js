@@ -63,3 +63,16 @@ export async function resetPasswordRequest({ email }) {
     if (!response_http.ok) throw new Error(response.message || 'Error al solicitar restablecimiento de contraseña')
     return response
 }
+
+export async function verifyToken(token) {
+    const response_http = await fetch(
+        `${ENVIRONMENT.API_URL}/api/auth/verify`,
+        {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
+    )
+    return response_http
+}

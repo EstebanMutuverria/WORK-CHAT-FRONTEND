@@ -47,19 +47,6 @@ const RegisterScreen = () => {
     resetForm
   } = useForm({ initialFormState, submitFn: onRegister })
 
-  const navigate = useNavigate()
-
-  useEffect(
-    () => {
-      setTimeout(() => {
-        if (response && response.ok) {
-          navigate('/login')
-        }
-        console.log(response)
-      }, 6000);
-    },
-    [response]
-  )
 
 
 

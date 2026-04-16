@@ -1,29 +1,25 @@
 import ENVIRONMENT from "../config/environment.config.js"
-import { LOCALSTORAGE_TOKEN_KEY } from "../context/AuthContext"
+import { authenticatedFetch } from "../helpers/authenticatedFetch"
 
 export async function getChannelsByWorkspaceId({ workspace_id }) {
-    const response_http = await fetch(
+    const response_http = await authenticatedFetch(
         ENVIRONMENT.API_URL + '/api/workspaces/' + workspace_id + '/channels',
         {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem(LOCALSTORAGE_TOKEN_KEY)
-            }
+            method: 'GET'
         }
     )
 
-    const response = response_http.json()
+    const response = await response_http.json()
     console.log(response)
     return response
 }
 
 export async function createChannel({ workspace_id, title, description }) {
-    const response_http = await fetch(
+    const response_http = await authenticatedFetch(
         ENVIRONMENT.API_URL + '/api/workspaces/' + workspace_id + '/channels',
         {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem(LOCALSTORAGE_TOKEN_KEY),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(
@@ -34,6 +30,6 @@ export async function createChannel({ workspace_id, title, description }) {
             )
         }
     )
-    const response = response_http.json()
+    const response = await response_http.json()
     return response
 }

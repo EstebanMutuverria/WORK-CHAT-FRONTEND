@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 
 export const AuthContext = createContext(
@@ -33,10 +33,25 @@ function AuthContextProvider({ children }) {
         navigate('/home')
     }
 
+    const logout = () => {
+        localStorage.removeItem(LOCALSTORAGE_TOKEN_KEY)
+        setIsLogged(false)
+        navigate('/login')
+    }
+
+    useEffect(() => {
+        const handleForceLogout = () => {
+            logout()
+        }
+        window.addEventListener('force-logout', handleForceLogout)
+        return () => window.removeEventListener('force-logout', handleForceLogout)
+    }, [logout])
+
     const providerValues = {
         isLogged,
         setIsLogged,
-        manageLogin
+        manageLogin,
+        logout
     }
     return (
         <AuthContext.Provider value={providerValues}>
