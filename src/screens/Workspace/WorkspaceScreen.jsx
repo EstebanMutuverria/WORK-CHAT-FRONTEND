@@ -110,7 +110,7 @@ const WorkspaceScreen = () => {
                     <div className="sidebar-header__workspace-icon">
                         {workspace?.workspace_image ? (
                             <img
-                                src={ENVIRONMENT.API_URL + workspace.workspace_image}
+                                src={workspace.workspace_image.startsWith('http') ? workspace.workspace_image : ENVIRONMENT.API_URL + workspace.workspace_image}
                                 alt={workspace.workspace_title}
                                 className="sidebar-workspace-img"
                             />
