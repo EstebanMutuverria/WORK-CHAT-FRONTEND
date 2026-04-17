@@ -8,6 +8,7 @@ import CreateWorkspaceScreen from "./screens/CreateWorkspaceScreen/CreateWorkspa
 import WorkspaceScreen from "./screens/Workspace/WorkspaceScreen"
 import CreateChannelScreen from "./screens/CreateChannelScreen/CreateChannelScreen"
 import CreateMemberScreen from "./screens/CreateMemberScreen/CreateMemberScreen"
+import ProfileScreen from "./screens/ProfileScreen/ProfileScreen"
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="/workspaces/:workspace_id/:channel_id" element={<WorkspaceScreen />} />
         <Route path="/workspaces/:workspace_id/create-channel" element={<CreateChannelScreen />} />
         <Route path="/workspaces/:workspace_id/create-member" element={<CreateMemberScreen />} />
+        <Route path="/profile" element={<ProfileScreen />} />
       </Route>
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/register" element={<RegisterScreen />} />

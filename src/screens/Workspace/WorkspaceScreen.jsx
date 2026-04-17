@@ -96,6 +96,8 @@ const WorkspaceScreen = () => {
     const members = response?.data?.members || []
     const channels = response?.data?.channels || []
 
+    console.log(members)
+
     const selectedChannel = channels.find(channel => channel._id === channel_id) || channels[0]
 
 
@@ -158,15 +160,18 @@ const WorkspaceScreen = () => {
                         </div>
                         <div className="sidebar-list">
                             {members.map(member => (
-                                <div className="sidebar-item" key={member.member_id}>
-                                    <div className="sidebar-item__avatar-wrapper">
-                                        <div className="sidebar-item__avatar">
-                                            {(member.user_name ? member.user_name[0] : 'U').toUpperCase()}
+                                member.member_acceptInvitation === 'accepted' && (
+                                    <div className="sidebar-item" key={member.member_id}>
+                                        <div className="sidebar-item__avatar-wrapper">
+                                            <div className="sidebar-item__avatar">
+                                                {(member.user_name ? member.user_name[0] : 'U').toUpperCase()}
+                                            </div>
+                                            {/*  <span className={`presence-dot ${Math.random() > 0.3 ? 'presence-dot--online' : 'presence-dot--offline'}`}></span> */}
                                         </div>
-                                        {/*  <span className={`presence-dot ${Math.random() > 0.3 ? 'presence-dot--online' : 'presence-dot--offline'}`}></span> */}
+                                        <span>{member.user_name || 'Usuario'}</span>
                                     </div>
-                                    <span>{member.user_name || 'Usuario'}</span>
-                                </div>
+                                )
+
                             ))}
                         </div>
                     </div>
