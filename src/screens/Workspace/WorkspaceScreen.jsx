@@ -154,7 +154,7 @@ const WorkspaceScreen = () => {
                     <div className="sidebar-section">
                         <div className="sidebar-section__title">
                             <span>Miembros</span>
-                            <button className="btn-add-item" style={{ color: 'inherit', fontSize: '18px', cursor: 'pointer' }}>+</button>
+                            <Link to={`/workspaces/${workspace_id}/create-member`} className="btn-add-item" style={{ color: 'inherit', fontSize: '18px', cursor: 'pointer' }}>+</Link>
                         </div>
                         <div className="sidebar-list">
                             {members.map(member => (

@@ -7,6 +7,7 @@ import AuthMiddleware from "./Middlewares/AuthMiddleware"
 import CreateWorkspaceScreen from "./screens/CreateWorkspaceScreen/CreateWorkspaceScreen"
 import WorkspaceScreen from "./screens/Workspace/WorkspaceScreen"
 import CreateChannelScreen from "./screens/CreateChannelScreen/CreateChannelScreen"
+import CreateMemberScreen from "./screens/CreateMemberScreen/CreateMemberScreen"
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/workspaces/:workspace_id" element={<WorkspaceScreen />} />
         <Route path="/workspaces/:workspace_id/:channel_id" element={<WorkspaceScreen />} />
         <Route path="/workspaces/:workspace_id/create-channel" element={<CreateChannelScreen />} />
+        <Route path="/workspaces/:workspace_id/create-member" element={<CreateMemberScreen />} />
       </Route>
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/register" element={<RegisterScreen />} />
