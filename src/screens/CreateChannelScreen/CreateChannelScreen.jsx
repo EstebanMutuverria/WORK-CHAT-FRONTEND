@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router';
 import useForm from '../../hooks/useForm';
 import useRequest from '../../hooks/useRequest';
 import { createChannel } from '../../service/channel.service';
+import { FaCodeBranch } from "react-icons/fa";
 
 const CreateChannelScreen = () => {
 
@@ -50,7 +51,7 @@ const CreateChannelScreen = () => {
             <div className="auth-card">
 
                 <div className="auth-card__brand">
-                    <div className="auth-card__logo">🏢</div>
+                    <div className="auth-card__logo"><FaCodeBranch /></div>
                     <span className="auth-card__app-name">WorkChat</span>
                 </div>
 

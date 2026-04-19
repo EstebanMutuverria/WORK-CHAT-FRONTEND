@@ -5,6 +5,8 @@ import ENVIRONMENT from '../../config/environment.config.js'
 import './HomeScreen.css'
 import { AuthContext } from '../../context/AuthContext.jsx'
 import WelcomeIntro from '../../components/WelcomeIntro/WelcomeIntro.jsx'
+import { FaUser } from "react-icons/fa";
+import { FaSignOutAlt } from "react-icons/fa";
 
 const HomeScreen = () => {
     const {
@@ -41,7 +43,7 @@ const HomeScreen = () => {
                         <span className="home-nav__title">WorkChat</span>
                     </div>
 
-                    <button 
+                    <button
                         className={`home-nav__mobile-toggle ${isMenuOpen ? 'is-active' : ''}`}
                         onClick={toggleMenu}
                         aria-label="Toggle menu"
@@ -54,14 +56,14 @@ const HomeScreen = () => {
                     <ul className={`home-nav__list ${isMenuOpen ? 'is-open' : ''}`}>
                         <li className="home-nav__item">
                             <Link to="/profile" className="home-nav__link" onClick={() => setIsMenuOpen(false)}>
-                                <span className="home-nav__icon">👤</span>
+                                <span className="home-nav__icon"><FaUser /></span>
                                 Perfil
                             </Link>
                         </li>
                         <li className="home-nav__item">
                             <button onClick={() => { logout(); setIsMenuOpen(false); }} className="home-nav__btn">
-                                <span className="home-nav__icon">🚪</span>
-                                Salir
+                                <span className="home-nav__icon"><FaSignOutAlt /></span>
+                                Logout
                             </button>
                         </li>
                     </ul>
@@ -97,10 +99,10 @@ const HomeScreen = () => {
                                 <span className="home-hero__greeting">¡Hola, {user.name}!</span>
                             </h1>
                             <p className="home-hero__subtitle">
-                                Qué bueno verte de nuevo. <br/>
+                                Qué bueno verte de nuevo. <br />
                                 Elegí un espacio de trabajo para continuar.
                             </p>
-                            
+
                             <div className="home-hero__actions">
                                 <Link className="btn btn--primary" style={{ width: 'auto' }} to="/create-workspace">
                                     <span>+</span> Crear espacio

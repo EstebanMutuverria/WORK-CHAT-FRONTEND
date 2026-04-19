@@ -3,6 +3,7 @@ import useForm from '../../hooks/useForm'
 import useRequest from '../../hooks/useRequest'
 import { Link, useParams } from 'react-router'
 import { createMember } from '../../service/member.service'
+import { FaUser } from "react-icons/fa";
 
 const CreateMemberScreen = () => {
 
@@ -21,7 +22,7 @@ const CreateMemberScreen = () => {
 
     const initialFormState = {
         [CREATE_MEMBER_FIELD_NAMES.EMAIL]: '',
-        [CREATE_MEMBER_FIELD_NAMES.ROLE]: 'user'
+        [CREATE_MEMBER_FIELD_NAMES.ROLE]: ''
     }
 
     function onCreateMember(formState) {
@@ -53,7 +54,7 @@ const CreateMemberScreen = () => {
             <div className="auth-page">
                 <div className="auth-card">
                     <div className="auth-card__brand">
-                        <div className="auth-card__logo">👤</div>
+                        <div className="auth-card__logo"><FaUser /></div>
                         <span className="auth-card__app-name">WorkChat</span>
                     </div>
 
@@ -102,11 +103,11 @@ const CreateMemberScreen = () => {
                                     type="select"
                                     id={CREATE_MEMBER_FIELD_NAMES.ROLE}
                                     name={CREATE_MEMBER_FIELD_NAMES.ROLE}
-                                    placeholder="¿De qué trata este espacio?"
                                     onChange={handleChangeInput}
                                     value={formState[CREATE_MEMBER_FIELD_NAMES.ROLE]}
                                     required
                                 >
+                                    <option value="">Seleccionar rol</option>
                                     <option value="admin">Admin</option>
                                     <option value="user">User</option>
                                 </select>

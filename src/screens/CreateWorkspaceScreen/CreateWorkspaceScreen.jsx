@@ -4,6 +4,7 @@ import useForm from '../../hooks/useForm'
 import useRequest from '../../hooks/useRequest'
 import { Link } from 'react-router'
 import '../../styles/auth.css'
+import { FaNetworkWired } from "react-icons/fa";
 
 const CreateWorkspaceScreen = () => {
     const [imagePreview, setImagePreview] = useState(null)
@@ -71,7 +72,7 @@ const CreateWorkspaceScreen = () => {
         <div className="auth-page">
             <div className="auth-card">
                 <div className="auth-card__brand">
-                    <div className="auth-card__logo">🏢</div>
+                    <div className="auth-card__logo"><FaNetworkWired /></div>
                     <span className="auth-card__app-name">WorkChat</span>
                 </div>
 
