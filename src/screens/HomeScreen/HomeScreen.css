@@ -227,7 +227,7 @@
 
 /* Hero / encabezado */
 .home-hero {
-  padding: var(--space-16) var(--space-6) var(--space-12);
+  padding-top: var(--space-8);
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
@@ -297,23 +297,40 @@
   position: relative;
   overflow: hidden;
   will-change: transform, opacity;
-  
+
   /* Staggered animation entrance */
   opacity: 0;
   transform: translateY(30px);
   animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
-              box-shadow 0.3s ease, 
-              border-color 0.3s ease;
+
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
 }
 
-.workspace-card:nth-child(1) { animation-delay: 0.1s; }
-.workspace-card:nth-child(2) { animation-delay: 0.2s; }
-.workspace-card:nth-child(3) { animation-delay: 0.3s; }
-.workspace-card:nth-child(4) { animation-delay: 0.4s; }
-.workspace-card:nth-child(5) { animation-delay: 0.5s; }
-.workspace-card:nth-child(n+6) { animation-delay: 0.6s; }
+.workspace-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.workspace-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.workspace-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.workspace-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.workspace-card:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.workspace-card:nth-child(n+6) {
+  animation-delay: 0.6s;
+}
 
 .workspace-card:hover {
   border-color: var(--color-brand-accent);
@@ -376,7 +393,7 @@
     font-size: 2.2rem;
     flex-wrap: wrap;
   }
-  
+
   .home-hero__wave {
     font-size: 2.5rem;
   }
@@ -389,14 +406,37 @@
 
 /* Animations */
 @keyframes wave {
-  0% { transform: rotate(0deg); }
-  10% { transform: rotate(14deg); }
-  20% { transform: rotate(-8deg); }
-  30% { transform: rotate(14deg); }
-  40% { transform: rotate(-4deg); }
-  50% { transform: rotate(10deg); }
-  60% { transform: rotate(0deg); }
-  100% { transform: rotate(0deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  10% {
+    transform: rotate(14deg);
+  }
+
+  20% {
+    transform: rotate(-8deg);
+  }
+
+  30% {
+    transform: rotate(14deg);
+  }
+
+  40% {
+    transform: rotate(-4deg);
+  }
+
+  50% {
+    transform: rotate(10deg);
+  }
+
+  60% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 @keyframes slideUpFade {
@@ -404,6 +444,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

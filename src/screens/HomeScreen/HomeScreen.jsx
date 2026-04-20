@@ -63,7 +63,7 @@ const HomeScreen = () => {
                         <li className="home-nav__item">
                             <button onClick={() => { logout(); setIsMenuOpen(false); }} className="home-nav__btn">
                                 <span className="home-nav__icon"><FaSignOutAlt /></span>
-                                Logout
+                                Cerrar sesion
                             </button>
                         </li>
                     </ul>
