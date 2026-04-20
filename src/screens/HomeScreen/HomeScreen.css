@@ -227,7 +227,7 @@
 
 /* Hero / encabezado */
 .home-hero {
-  padding-top: var(--space-8);
+  padding-top: var(--space-1);
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
@@ -235,6 +235,7 @@
 }
 
 .home-hero__title {
+  padding-top: var(--space-8);
   display: flex;
   align-items: center;
   justify-content: center;

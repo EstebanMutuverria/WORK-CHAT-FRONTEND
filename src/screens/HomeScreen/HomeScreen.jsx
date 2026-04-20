@@ -5,8 +5,9 @@ import ENVIRONMENT from '../../config/environment.config.js'
 import './HomeScreen.css'
 import { AuthContext } from '../../context/AuthContext.jsx'
 import WelcomeIntro from '../../components/WelcomeIntro/WelcomeIntro.jsx'
-import { FaUser } from "react-icons/fa";
+import { FaBuilding, FaUser } from "react-icons/fa";
 import { FaSignOutAlt } from "react-icons/fa";
+import { HiDotsVertical } from "react-icons/hi";
 
 const HomeScreen = () => {
     const {
@@ -71,6 +72,10 @@ const HomeScreen = () => {
             </nav>
 
             <div className={`home-main-content ${isMenuOpen ? 'is-blurred' : ''}`}>
+                <h1 className="home-hero__title">
+                    <span className="home-hero__wave">👋</span>
+                    <span className="home-hero__greeting">¡Hola, {user.name}!</span>
+                </h1>
                 {loading && (
                     <div className="loading-state">
                         <span className="spinner" aria-hidden="true"></span>
@@ -80,7 +85,7 @@ const HomeScreen = () => {
 
                 {!loading && response && response.ok && (workspaces?.length || 0) === 0 && (
                     <div className="empty-state">
-                        <div className="empty-state__icon">🏢</div>
+                        <div className="empty-state__icon"><FaBuilding /></div>
                         <h2 className="empty-state__title">No tenés espacios de trabajo</h2>
                         <p className="empty-state__description">
                             Creá tu primer espacio de trabajo para empezar a colaborar con tu equipo.
@@ -94,10 +99,6 @@ const HomeScreen = () => {
                 {!loading && response && response.ok && (workspaces?.length || 0) > 0 && (
                     <div className="home-content-container">
                         <div className="home-hero">
-                            <h1 className="home-hero__title">
-                                <span className="home-hero__wave">👋</span>
-                                <span className="home-hero__greeting">¡Hola, {user.name}!</span>
-                            </h1>
                             <p className="home-hero__subtitle">
                                 Qué bueno verte de nuevo. <br />
                                 Elegí un espacio de trabajo para continuar.
@@ -137,6 +138,9 @@ const HomeScreen = () => {
                                                 Abrir espacio →
                                             </Link>
                                         </div>
+                                        <button className="workspace-card__delete">
+                                            <HiDotsVertical />
+                                        </button>
                                     </div>
                                 )
                             )}
