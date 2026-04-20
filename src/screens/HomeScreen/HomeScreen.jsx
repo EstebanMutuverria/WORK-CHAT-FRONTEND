@@ -72,81 +72,83 @@ const HomeScreen = () => {
             </nav>
 
             <div className={`home-main-content ${isMenuOpen ? 'is-blurred' : ''}`}>
-                <h1 className="home-hero__title">
-                    <span className="home-hero__wave">👋</span>
-                    <span className="home-hero__greeting">¡Hola, {user.name}!</span>
-                </h1>
-                {loading && (
-                    <div className="loading-state">
-                        <span className="spinner" aria-hidden="true"></span>
-                        <span>Cargando espacios de trabajo...</span>
-                    </div>
-                )}
+                <div className="home-content-container">
+                    <h1 className="home-hero__title">
+                        <span className="home-hero__wave">👋</span>
+                        <span className="home-hero__greeting">¡Hola, {user.name}!</span>
+                    </h1>
+                    {loading && (
+                        <div className="loading-state">
+                            <span className="spinner" aria-hidden="true"></span>
+                            <span>Cargando espacios de trabajo...</span>
+                        </div>
+                    )}
 
-                {!loading && response && response.ok && (workspaces?.length || 0) === 0 && (
-                    <div className="empty-state">
-                        <div className="empty-state__icon"><FaBuilding /></div>
-                        <h2 className="empty-state__title">No tenés espacios de trabajo</h2>
-                        <p className="empty-state__description">
-                            Creá tu primer espacio de trabajo para empezar a colaborar con tu equipo.
-                        </p>
-                        <Link className="btn btn--primary" style={{ width: 'auto' }} to="/create-workspace">
-                            Crear espacio de trabajo
-                        </Link>
-                    </div>
-                )}
-
-                {!loading && response && response.ok && (workspaces?.length || 0) > 0 && (
-                    <div className="home-content-container">
-                        <div className="home-hero">
-                            <p className="home-hero__subtitle">
-                                Qué bueno verte de nuevo. <br />
-                                Elegí un espacio de trabajo para continuar.
+                    {!loading && response && response.ok && (workspaces?.length || 0) === 0 && (
+                        <div className="empty-state">
+                            <div className="empty-state__icon"><FaBuilding /></div>
+                            <h2 className="empty-state__title">No tenés espacios de trabajo</h2>
+                            <p className="empty-state__description">
+                                Creá tu primer espacio de trabajo para empezar a colaborar con tu equipo.
                             </p>
+                            <Link className="btn btn--primary" style={{ width: 'auto' }} to="/create-workspace">
+                                Crear espacio de trabajo
+                            </Link>
+                        </div>
+                    )}
 
-                            <div className="home-hero__actions">
-                                <Link className="btn btn--primary" style={{ width: 'auto' }} to="/create-workspace">
-                                    <span>+</span> Crear espacio
-                                </Link>
+                    {!loading && response && response.ok && (workspaces?.length || 0) > 0 && (
+                        <>
+                            <div className="home-hero">
+                                <p className="home-hero__subtitle">
+                                    Qué bueno verte de nuevo. <br />
+                                    Elegí un espacio de trabajo para continuar.
+                                </p>
+
+                                <div className="home-hero__actions">
+                                    <Link className="btn btn--primary" style={{ width: 'auto' }} to="/create-workspace">
+                                        <span>+</span> Crear espacio
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="workspace-grid">
-                            {workspaces.map(
-                                (workspace) => (
-                                    <div className="workspace-card" key={workspace.workspace_id}>
-                                        <div className="workspace-card__icon">
-                                            {workspace.workspace_image ? (
-                                                <img
-                                                    src={workspace.workspace_image.startsWith('http') ? workspace.workspace_image : ENVIRONMENT.API_URL + workspace.workspace_image}
-                                                    alt={workspace.workspace_title}
-                                                    className="workspace-card__img"
-                                                />
-                                            ) : (
-                                                <div className="workspace-card__initials">
-                                                    {getInitials(workspace.workspace_title)}
-                                                </div>
-                                            )}
+                            <div className="workspace-grid">
+                                {workspaces.map(
+                                    (workspace) => (
+                                        <div className="workspace-card" key={workspace.workspace_id}>
+                                            <div className="workspace-card__icon">
+                                                {workspace.workspace_image ? (
+                                                    <img
+                                                        src={workspace.workspace_image.startsWith('http') ? workspace.workspace_image : ENVIRONMENT.API_URL + workspace.workspace_image}
+                                                        alt={workspace.workspace_title}
+                                                        className="workspace-card__img"
+                                                    />
+                                                ) : (
+                                                    <div className="workspace-card__initials">
+                                                        {getInitials(workspace.workspace_title)}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="workspace-card__body">
+                                                <h2 className="workspace-card__name">{workspace.workspace_title}</h2>
+                                                <p className="workspace-card__meta">Espacio de trabajo</p>
+                                                <Link
+                                                    className="btn btn--workspace"
+                                                    to={'/workspaces/' + workspace.workspace_id}
+                                                >
+                                                    Abrir espacio →
+                                                </Link>
+                                            </div>
+                                            <button className="workspace-card__delete">
+                                                <HiDotsVertical />
+                                            </button>
                                         </div>
-                                        <div className="workspace-card__body">
-                                            <h2 className="workspace-card__name">{workspace.workspace_title}</h2>
-                                            <p className="workspace-card__meta">Espacio de trabajo</p>
-                                            <Link
-                                                className="btn btn--workspace"
-                                                to={'/workspaces/' + workspace.workspace_id}
-                                            >
-                                                Abrir espacio →
-                                            </Link>
-                                        </div>
-                                        <button className="workspace-card__delete">
-                                            <HiDotsVertical />
-                                        </button>
-                                    </div>
-                                )
-                            )}
-                        </div>
-                    </div>
-                )}
+                                    )
+                                )}
+                            </div>
+                        </>
+                    )}
+                </div>
 
                 {error && (
                     <div className="empty-state">

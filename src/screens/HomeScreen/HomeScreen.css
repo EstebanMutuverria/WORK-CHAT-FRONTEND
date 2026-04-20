@@ -226,6 +226,15 @@
 }
 
 /* Hero / encabezado */
+.home-content-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  text-align: center;
+}
+
 .home-hero {
   padding-top: var(--space-1);
   text-align: center;
