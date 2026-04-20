@@ -307,7 +307,8 @@
   position: relative;
   overflow: hidden;
   will-change: transform, opacity;
-
+  justify-content: start;
+  text-align: left;
   /* Staggered animation entrance */
   opacity: 0;
   transform: translateY(30px);
