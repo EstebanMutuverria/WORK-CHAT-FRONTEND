@@ -1,0 +1,49 @@
+.delete-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding-top: var(--space-2);
+}
+
+.delete-confirm__text {
+    font-size: var(--font-size-md);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.delete-confirm__text strong {
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+.delete-confirm__warning {
+    padding: var(--space-4);
+    background: rgba(224, 30, 90, 0.08); /* Minimalist ghostly background */
+    border-radius: var(--radius-lg);
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.delete-confirm__actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.btn--danger-solid {
+    background: var(--color-error);
+    color: white;
+    flex: 1;
+    border: none;
+    box-shadow: 0 4px 12px rgba(224, 30, 90, 0.2);
+    /* Se apoya en propiedades base de .btn */
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn--danger-solid:hover {
+    background: #c0153e;
+    box-shadow: 0 6px 16px rgba(224, 30, 90, 0.4);
+    transform: translateY(-1px);
+}

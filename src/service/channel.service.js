@@ -10,7 +10,7 @@ export async function getChannelsByWorkspaceId({ workspace_id }) {
     )
 
     const response = await response_http.json()
-    console.log(response)
+    if (!response.ok) throw response
     return response
 }
 
@@ -22,14 +22,26 @@ export async function createChannel({ workspace_id, title, description }) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(
-                {
-                    title,
-                    description
-                }
-            )
+            body: JSON.stringify({ title, description })
         }
     )
     const response = await response_http.json()
+    if (!response.ok) throw response
+    return response
+}
+
+export async function updateChannel({ workspace_id, channel_id, title, description }) {
+    const response_http = await authenticatedFetch(
+        ENVIRONMENT.API_URL + `/api/workspaces/${workspace_id}/channels/${channel_id}`,
+        {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title, description })
+        }
+    )
+    const response = await response_http.json()
+    if (!response.ok) throw response
     return response
 }

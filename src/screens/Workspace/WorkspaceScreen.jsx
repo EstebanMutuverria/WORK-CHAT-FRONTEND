@@ -5,10 +5,22 @@ import { getWorkspaceById } from '../../service/workspace.service.js'
 import './WorkspaceScreen.css'
 import ENVIRONMENT from '../../config/environment.config.js'
 import { getChannelsByWorkspaceId } from '../../service/channel.service.js'
+import ChannelFormModal from '../../components/ChannelFormModal/ChannelFormModal'
+import MemberFormModal from '../../components/MemberFormModal/MemberFormModal'
+import { FaPlus, FaCog, FaHashtag } from 'react-icons/fa'
 
 const WorkspaceScreen = () => {
     const { workspace_id, channel_id } = useParams()
+    const { member_id } = useParams()
     const [isSidebarVisible, setIsSidebarVisible] = useState(true)
+
+    const [isChannelModalOpen, setIsChannelModalOpen] = useState(false)
+    const [channelModalMode, setChannelModalMode] = useState('create')
+    const [selectedChannelForEdit, setSelectedChannelForEdit] = useState(null)
+
+    const [isMemberModalOpen, setIsMemberModalOpen] = useState(false)
+    const [memberModalMode, setMemberModalMode] = useState('create')
+    const [selectedMemberForEdit, setSelectedMemberForEdit] = useState(null)
 
     const getInitials = (title) => {
         if (!title) return '?'
@@ -27,30 +39,28 @@ const WorkspaceScreen = () => {
         loading
     } = useRequest()
 
-    useEffect(
-        () => {
-            sendRequest(
-                {
-                    requestCb: async () => {
-                        const [workspaceResponse, channelsResponse] = await Promise.all([
-                            getWorkspaceById({ workspace_id }),
-                            getChannelsByWorkspaceId({ workspace_id })
-                        ])
-                        return {
-                            ...workspaceResponse,
-                            data: {
-                                ...workspaceResponse.data,
-                                channels: channelsResponse.data.channels
-                            }
-                        }
+    const handleRefresh = () => {
+        sendRequest({
+            requestCb: async () => {
+                const [workspaceResponse, channelsResponse] = await Promise.all([
+                    getWorkspaceById({ workspace_id }),
+                    getChannelsByWorkspaceId({ workspace_id })
+                ])
+                return {
+                    ...workspaceResponse,
+                    data: {
+                        ...workspaceResponse.data,
+                        channels: channelsResponse.data.channels
                     }
                 }
-            )
-        },
-        [workspace_id]
-    )
+            }
+        })
+    }
 
-    // Automatically hide sidebar on small screens on initial load
+    useEffect(() => {
+        handleRefresh()
+    }, [workspace_id])
+
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 768) {
@@ -59,14 +69,34 @@ const WorkspaceScreen = () => {
                 setIsSidebarVisible(true)
             }
         }
-        handleResize() // Set initial state
-        // We don't necessarily want to toggle it every time window resizes if user manually changed it, 
-        // but for a first implementation this is fine.
+        handleResize()
     }, [])
+
+    const handleOpenCreateChannel = (e) => {
+        e?.preventDefault()
+        setChannelModalMode('create')
+        setSelectedChannelForEdit(null)
+        setIsChannelModalOpen(true)
+    }
+
+    const handleOpenEditChannel = (e, channel) => {
+        e?.preventDefault()
+        e?.stopPropagation()
+        setChannelModalMode('edit')
+        setSelectedChannelForEdit(channel)
+        setIsChannelModalOpen(true)
+    }
+
+    const handleOpenInviteMember = (e) => {
+        e?.preventDefault()
+        setMemberModalMode('create')
+        setSelectedMemberForEdit(null)
+        setIsMemberModalOpen(true)
+    }
 
     const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible)
 
-    if (loading) {
+    if (loading && !response) {
         return (
             <div className="workspace-full-state">
                 <div className="loading-state">
@@ -95,18 +125,13 @@ const WorkspaceScreen = () => {
     const workspace = response?.data?.workspace
     const members = response?.data?.members || []
     const channels = response?.data?.channels || []
-
-    console.log(members)
-
     const selectedChannel = channels.find(channel => channel._id === channel_id) || channels[0]
-
+    const selectedMember = members.find(member => member.member_id === member_id);
 
     return (
         <div className={`workspace-layout ${!isSidebarVisible ? 'sidebar-hidden' : ''}`}>
-            {/* SIDEBAR OVERLAY (Mobile) */}
             {isSidebarVisible && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
 
-            {/* SIDEBAR */}
             <aside className={`workspace-sidebar ${isSidebarVisible ? 'visible' : ''}`}>
                 <div className="workspace-sidebar__header">
                     <div className="sidebar-header__workspace-icon">
@@ -136,19 +161,27 @@ const WorkspaceScreen = () => {
                     <div className="sidebar-section">
                         <div className="sidebar-section__title">
                             <span>Canales</span>
-                            <Link to={`/workspaces/${workspace_id}/create-channel`} className="btn-add-item" style={{ color: 'inherit', fontSize: '18px', cursor: 'pointer' }}>+</Link>
+                            <button onClick={handleOpenCreateChannel} className="btn-add-item" style={{ background: 'none', border: 'none', color: 'inherit', fontSize: '18px', cursor: 'pointer' }}>+</button>
                         </div>
                         <div className="sidebar-list">
                             {channels.map((channel) => (
-                                <Link
-                                    to={`/workspaces/${workspace_id}/${channel._id}`}
-                                    key={channel._id}
-                                    className={`sidebar-item ${selectedChannel?._id === channel._id ? 'sidebar-item--active' : ''}`}
-                                    onClick={() => window.innerWidth < 768 && setIsSidebarVisible(false)}
-                                >
-                                    <span className="sidebar-item__icon">#</span>
-                                    <span>{channel.title}</span>
-                                </Link>
+                                <div key={channel._id} className="sidebar-item-container" style={{ position: 'relative' }}>
+                                    <Link
+                                        to={`/workspaces/${workspace_id}/${channel._id}`}
+                                        className={`sidebar-item ${selectedChannel?._id === channel._id ? 'sidebar-item--active' : ''}`}
+                                        onClick={() => window.innerWidth < 768 && setIsSidebarVisible(false)}
+                                    >
+                                        <span className="sidebar-item__icon">#</span>
+                                        <span>{channel.title}</span>
+                                    </Link>
+                                    <button
+                                        className="btn-edit-channel"
+                                        onClick={(e) => handleOpenEditChannel(e, channel)}
+                                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', opacity: 0.6 }}
+                                    >
+                                        <FaCog size={12} />
+                                    </button>
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -156,7 +189,7 @@ const WorkspaceScreen = () => {
                     <div className="sidebar-section">
                         <div className="sidebar-section__title">
                             <span>Miembros</span>
-                            <Link to={`/workspaces/${workspace_id}/create-member`} className="btn-add-item" style={{ color: 'inherit', fontSize: '18px', cursor: 'pointer' }}>+</Link>
+                            <button onClick={handleOpenInviteMember} className="btn-add-item" style={{ background: 'none', border: 'none', color: 'inherit', fontSize: '18px', cursor: 'pointer' }}>+</button>
                         </div>
                         <div className="sidebar-list">
                             {members.map(member => (
@@ -166,12 +199,11 @@ const WorkspaceScreen = () => {
                                             <div className="sidebar-item__avatar">
                                                 {(member.user_name ? member.user_name[0] : 'U').toUpperCase()}
                                             </div>
-                                            {/*  <span className={`presence-dot ${Math.random() > 0.3 ? 'presence-dot--online' : 'presence-dot--offline'}`}></span> */}
                                         </div>
                                         <span>{member.user_name || 'Usuario'}</span>
+                                        <span className='sidebar-member-role'>{member.member_role}</span>
                                     </div>
                                 )
-
                             ))}
                         </div>
                     </div>
@@ -179,7 +211,6 @@ const WorkspaceScreen = () => {
                 <Link className='btn btn--secondary aside' to={`/home`}>Volver al inicio</Link>
             </aside>
 
-            {/* MAIN CHAT */}
             <main className="workspace-main">
                 <header className="chat-header">
                     <button className="sidebar-toggle-btn" onClick={toggleSidebar} aria-label="Toggle Sidebar">
@@ -204,9 +235,9 @@ const WorkspaceScreen = () => {
                     channels.length === 0 ? (
                         <div className="chat-without-channels">
                             <p className="chat-messages__empty-text">No hay canales en este espacio de trabajo</p>
-                            <Link className="btn btn--primary create-channel-btn" to={`/workspaces/${workspace_id}/create-channel`}>
+                            <button className="btn btn--primary create-channel-btn" onClick={handleOpenCreateChannel}>
                                 Crear canal
-                            </Link>
+                            </button>
                         </div>
                     ) : selectedChannel ? (
                         <div className="chat-messages" key={selectedChannel._id}>
@@ -245,6 +276,24 @@ const WorkspaceScreen = () => {
                     </div>
                 )}
             </main>
+
+            <ChannelFormModal
+                isOpen={isChannelModalOpen}
+                mode={channelModalMode}
+                channel={selectedChannelForEdit}
+                workspaceId={workspace_id}
+                onClose={() => setIsChannelModalOpen(false)}
+                onRefresh={handleRefresh}
+            />
+
+            <MemberFormModal
+                isOpen={isMemberModalOpen}
+                mode={memberModalMode}
+                member={selectedMemberForEdit}
+                workspaceId={workspace_id}
+                onClose={() => setIsMemberModalOpen(false)}
+                onRefresh={handleRefresh}
+            />
         </div>
     )
 }

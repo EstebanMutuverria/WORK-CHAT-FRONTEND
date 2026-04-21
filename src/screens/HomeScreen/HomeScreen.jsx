@@ -8,30 +8,45 @@ import WelcomeIntro from '../../components/WelcomeIntro/WelcomeIntro.jsx'
 import { FaBuilding, FaUser } from "react-icons/fa";
 import { FaSignOutAlt } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
+import WorkspaceFormModal from '../../components/WorkspaceFormModal/WorkspaceFormModal.jsx'
+
 
 const HomeScreen = () => {
     const {
         response,
         loading,
         error,
-        workspaces
+        workspaces,
+        refetch
     } = useWorkSpaces()
 
-    const getInitials = (title) => {
-        if (!title) return '?'
-        return title
-            .split(' ')
-            .map(word => word[0])
-            .join('')
-            .slice(0, 2)
-            .toUpperCase()
+    const getInitials = (t) => {
+        if (!t) return '?'
+        return t.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
     }
 
     const { user, logout, showIntro, setShowIntro } = useContext(AuthContext)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const [selectedWorkspace, setSelectedWorkspace] = useState(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [modalMode, setModalMode] = useState('create')
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
-    console.log(user)
+
+    const handleOpenSettings = (e, workspace) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setSelectedWorkspace(workspace)
+        setModalMode('view')
+        setIsModalOpen(true)
+    }
+
+    const handleCreateWorkspace = (e) => {
+        e.preventDefault()
+        setSelectedWorkspace(null)
+        setModalMode('create')
+        setIsModalOpen(true)
+    }
 
     return (
         <div className="home-page">
@@ -91,9 +106,9 @@ const HomeScreen = () => {
                             <p className="empty-state__description">
                                 Creá tu primer espacio de trabajo para empezar a colaborar con tu equipo.
                             </p>
-                            <Link className="btn btn--primary" style={{ width: 'auto' }} to="/create-workspace">
+                            <button className="btn btn--primary" style={{ width: 'auto' }} onClick={handleCreateWorkspace}>
                                 Crear espacio de trabajo
-                            </Link>
+                            </button>
                         </div>
                     )}
 
@@ -106,45 +121,46 @@ const HomeScreen = () => {
                                 </p>
 
                                 <div className="home-hero__actions">
-                                    <Link className="btn btn--primary" style={{ width: 'auto' }} to="/create-workspace">
+                                    <button className="btn btn--primary" style={{ width: 'auto' }} onClick={handleCreateWorkspace}>
                                         <span>+</span> Crear espacio
-                                    </Link>
+                                    </button>
                                 </div>
                             </div>
 
                             <div className="workspace-grid">
-                                {workspaces.map(
-                                    (workspace) => (
-                                        <div className="workspace-card" key={workspace.workspace_id}>
-                                            <div className="workspace-card__icon">
-                                                {workspace.workspace_image ? (
-                                                    <img
-                                                        src={workspace.workspace_image.startsWith('http') ? workspace.workspace_image : ENVIRONMENT.API_URL + workspace.workspace_image}
-                                                        alt={workspace.workspace_title}
-                                                        className="workspace-card__img"
-                                                    />
-                                                ) : (
-                                                    <div className="workspace-card__initials">
-                                                        {getInitials(workspace.workspace_title)}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="workspace-card__body">
-                                                <h2 className="workspace-card__name">{workspace.workspace_title}</h2>
-                                                <p className="workspace-card__meta">Espacio de trabajo</p>
-                                                <Link
-                                                    className="btn btn--workspace"
-                                                    to={'/workspaces/' + workspace.workspace_id}
-                                                >
-                                                    Abrir espacio →
-                                                </Link>
-                                            </div>
-                                            <button className="workspace-card__delete">
-                                                <HiDotsVertical />
-                                            </button>
+                                {workspaces.map((workspace) => (
+                                    <div className="workspace-card" key={workspace.workspace_id}>
+                                        <div className="workspace-card__icon">
+                                            {workspace.workspace_image ? (
+                                                <img
+                                                    src={workspace.workspace_image.startsWith('http') ? workspace.workspace_image : ENVIRONMENT.API_URL + workspace.workspace_image}
+                                                    alt={workspace.workspace_title}
+                                                    className="workspace-card__img"
+                                                />
+                                            ) : (
+                                                <div className="workspace-card__initials">
+                                                    {getInitials(workspace.workspace_title)}
+                                                </div>
+                                            )}
                                         </div>
-                                    )
-                                )}
+                                        <div className="workspace-card__body">
+                                            <h2 className="workspace-card__name">{workspace.workspace_title}</h2>
+                                            <p className="workspace-card__meta">Espacio de trabajo</p>
+                                            <Link
+                                                className="btn btn--workspace"
+                                                to={'/workspaces/' + workspace.workspace_id}
+                                            >
+                                                Abrir espacio →
+                                            </Link>
+                                        </div>
+                                        <button
+                                            className="workspace-card__delete"
+                                            onClick={(e) => handleOpenSettings(e, workspace)}
+                                        >
+                                            <HiDotsVertical />
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         </>
                     )}
@@ -158,6 +174,17 @@ const HomeScreen = () => {
                     </div>
                 )}
             </div>
+
+            <WorkspaceFormModal
+                isOpen={isModalOpen}
+                mode={modalMode}
+                workspace={selectedWorkspace}
+                onClose={() => {
+                    setIsModalOpen(false)
+                    setSelectedWorkspace(null)
+                }}
+                onRefresh={refetch}
+            />
 
         </div>
     )

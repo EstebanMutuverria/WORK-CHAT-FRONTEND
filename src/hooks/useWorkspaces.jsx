@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useCallback } from "react"
 import useRequest from "./useRequest"
 import { getWorkspaces } from "../service/workspace.service"
 
@@ -10,22 +10,20 @@ function useWorkSpaces() {
         loading //Estado que guarda el estado de cargando del servidor
     } = useRequest()
 
-    useEffect(
-        () => {
-            sendRequest(
-                {
-                    requestCb: getWorkspaces
-                }
-            )
-        },
-        []
-    )
+    const fetchWorkspaces = useCallback(() => {
+        sendRequest({ requestCb: getWorkspaces })
+    }, [sendRequest])
+
+    useEffect(() => {
+        fetchWorkspaces()
+    }, [fetchWorkspaces])
 
     return {
         response,
         loading,
         error,
-        workspaces: response?.data?.workspacesList //Esto lo hacemos para saber si la respuesta de la consulta a la BD trae al menos un espacio de trabajo
+        workspaces: response?.data?.workspacesList,
+        refetch: fetchWorkspaces
     }
 }
 

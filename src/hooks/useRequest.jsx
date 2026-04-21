@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 /* 
 Manejar con estados de react el estado actual de una consulta HTTP
@@ -21,7 +21,7 @@ function useRequest() {
     /* 
     Recibe una funcion que emita un consulta al servidor por parametro (Callback)
     */
-    async function sendRequest({ requestCb }) {
+    const sendRequest = useCallback(async ({ requestCb }) => {
         try {
             setResponse(null) //Si habia una consulta anterior quiero limpiar la respuesta
             setError(null) //Si habia una consulta anterior quiero limpiar el error
@@ -36,11 +36,19 @@ function useRequest() {
         finally {
             setLoading(false) //Pase lo que pase (error o todo bien) cargando vuelve a ser false
         }
-    }
+    }, [])
+
+
+    const resetRequest = useCallback(() => {
+        setResponse(null)
+        setError(null)
+        setLoading(false)
+    }, [])
 
 
     return {
         sendRequest, //Funcion para activar una consulta al servidor
+        resetRequest, //Funcion para limpiar los estados
         response, //Estado que guarda el estado de respuesta del servidor
         error, //Estado que guarda el estado de error del servidor
         loading //Estado que guarda el estado de cargando del servidor
