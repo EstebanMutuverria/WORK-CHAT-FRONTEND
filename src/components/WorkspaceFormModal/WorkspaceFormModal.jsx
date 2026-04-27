@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import Modal from '../Modal/Modal'
 import './WorkspaceFormModal.css'
 import useRequest from '../../hooks/useRequest'
+import useForm from '../../hooks/useForm'
 import DeleteConfirmModal from '../DeleteConfirmModal/DeleteConfirmModal'
 import { updateWorkspace, createWorkspace, deleteWorkspace } from '../../service/workspace.service'
 import ENVIRONMENT from '../../config/environment.config'
@@ -18,28 +19,54 @@ import { FaTrash, FaEdit, FaSave, FaTimes, FaCamera, FaPlus } from 'react-icons/
  */
 const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRefresh }) => {
     const [isEditing, setIsEditing] = useState(mode === 'edit' || mode === 'create')
-    const [title, setTitle] = useState('')
-    const [description, setDescription] = useState('')
-    const [image, setImage] = useState(null)
-    const [imagePreview, setImagePreview] = useState(null)
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-    const fileInputRef = useRef(null)
     const hasRefreshed = useRef(false)
+    const fileInputRef = useRef(null)
 
     const { sendRequest: sendSubmit, resetRequest, loading: submitting, error: submitError, response: submitResponse } = useRequest()
+
+    const { formState, handleChangeInput, setFields, resetForm, onSubmit } = useForm({
+        initialFormState: {
+            title: '',
+            description: '',
+            image: null,
+            imagePreview: null
+        },
+        submitFn: async (values) => {
+            if (mode === 'create' || !workspace) {
+                await sendSubmit({
+                    requestCb: () => createWorkspace({
+                        title: values.title,
+                        description: values.description,
+                        image: values.image
+                    })
+                })
+            } else {
+                await sendSubmit({
+                    requestCb: () => updateWorkspace({
+                        workspace_id: workspace.workspace_id,
+                        title: values.title,
+                        description: values.description,
+                        image: values.image,
+                    })
+                })
+            }
+        }
+    })
 
     // Sincronizar estado con el workspace recibido o resetear para creación
     useEffect(() => {
         if (isOpen) {
             if (workspace && mode !== 'create') {
-                setTitle(workspace.workspace_title || '')
-                setDescription(workspace.workspace_description || '')
+                setFields({
+                    title: workspace.workspace_title || '',
+                    description: workspace.workspace_description || '',
+                    image: null,
+                    imagePreview: null
+                })
                 setIsEditing(mode === 'edit')
             } else {
-                setTitle('')
-                setDescription('')
-                setImage(null)
-                setImagePreview(null)
+                resetForm()
                 setIsEditing(true)
             }
             hasRefreshed.current = false
@@ -52,44 +79,14 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
         resetRequest() // Limpiar estados de peticiones previas al cambiar de modo
         if (isEditing && mode !== 'create') {
             // Cancelar edición: resetear valores
-            setTitle(workspace.workspace_title || '')
-            setDescription(workspace.workspace_description || '')
-            setImagePreview(null)
-            setImage(null)
+            setFields({
+                title: workspace.workspace_title || '',
+                description: workspace.workspace_description || '',
+                image: null,
+                imagePreview: null
+            })
         }
         setIsEditing(!isEditing)
-    }
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0]
-        if (file) {
-            setImage(file)
-            setImagePreview(URL.createObjectURL(file))
-        }
-    }
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        if (!title.trim() || !description.trim()) return
-
-        if (mode === 'create' || !workspace) {
-            await sendSubmit({
-                requestCb: () => createWorkspace({
-                    title,
-                    description,
-                    image
-                })
-            })
-        } else {
-            await sendSubmit({
-                requestCb: () => updateWorkspace({
-                    workspace_id: workspace.workspace_id,
-                    title,
-                    description,
-                    image: image,
-                })
-            })
-        }
     }
 
     // Efecto para manejar el éxito
@@ -139,18 +136,18 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                 title={modalTitle}
             >
                 <div className="ws-form">
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={onSubmit}>
                         <div className="ws-form__header">
                             <div className="ws-form__image-container">
-                                {imagePreview || currentImage ? (
+                                {formState.imagePreview || currentImage ? (
                                     <img
-                                        src={imagePreview || currentImage}
-                                        alt={title}
+                                        src={formState.imagePreview || currentImage}
+                                        alt={formState.title}
                                         className="ws-form__img"
                                     />
                                 ) : (
                                     <div className="ws-form__initials">
-                                        {getInitials(title)}
+                                        {getInitials(formState.title)}
                                     </div>
                                 )}
 
@@ -166,9 +163,10 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                                 )}
                                 <input
                                     type="file"
+                                    name="image"
                                     ref={fileInputRef}
                                     style={{ display: 'none' }}
-                                    onChange={handleImageChange}
+                                    onChange={handleChangeInput}
                                     accept="image/*"
                                     required={false}
                                 />
@@ -181,9 +179,10 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                                 <label className="form-label">Nombre del Espacio</label>
                                 <input
                                     type="text"
+                                    name="title"
                                     className="form-input"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
+                                    value={formState.title}
+                                    onChange={handleChangeInput}
                                     readOnly={!isEditing}
                                     placeholder="Ej: Equipo de Desarrollo"
                                     disabled={submitting}
@@ -193,9 +192,10 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                             <div className="form-group">
                                 <label className="form-label">Descripción</label>
                                 <textarea
+                                    name="description"
                                     className="form-textarea form-input"
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
+                                    value={formState.description}
+                                    onChange={handleChangeInput}
                                     readOnly={!isEditing}
                                     placeholder="¿Misión del equipo?"
                                     rows="3"

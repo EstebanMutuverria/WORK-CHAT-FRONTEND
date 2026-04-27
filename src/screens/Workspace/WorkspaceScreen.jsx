@@ -278,7 +278,7 @@ const WorkspaceScreen = () => {
                 }
 
                 {channels.length > 0 && (
-                    <div className="chat-input-container">
+                    <form className="chat-input-container">
                         <div className="chat-input-wrapper">
                             <textarea
                                 className="chat-input"
@@ -286,12 +286,12 @@ const WorkspaceScreen = () => {
                                 rows={1}
                             ></textarea>
                             <div className="chat-input-actions">
-                                <button className="btn-send">
+                                <button type='submit' className="btn-send">
                                     Enviar
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 )}
             </main>
 

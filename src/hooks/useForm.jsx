@@ -18,16 +18,31 @@ function useForm({ initialFormState, submitFn }) {
     )
 
     function handleChangeInput(event) {
-        const field_name = event.target.name
-        const field_value = event.target.value
-        setFormState(
-            (prevFormState) => {
-                return {
-                    ...prevFormState,
-                    [field_name]: field_value
+        const { name, value, type, files } = event.target
+        
+        setFormState((prev) => {
+            const newState = { ...prev }
+            
+            if (type === 'file') {
+                const file = files[0]
+                newState[name] = file
+                // If it's an image, create a preview
+                if (file && file.type.startsWith('image/')) {
+                    newState[`${name}Preview`] = URL.createObjectURL(file)
                 }
+            } else {
+                newState[name] = value
             }
-        )
+            
+            return newState
+        })
+    }
+
+    function setFields(fields) {
+        setFormState((prev) => ({
+            ...prev,
+            ...fields
+        }))
     }
 
     function onSubmit(event) {
@@ -40,9 +55,10 @@ function useForm({ initialFormState, submitFn }) {
     }
 
     return {
-        handleChangeInput, //es la funcion que debo ASOCIAR al cambio del input (onChange)
+        handleChangeInput,
         onSubmit,
-        formState, //es el estado con los valores MAS ACTUALES de cada campo de mi formulario
+        formState,
+        setFields,
         resetForm
     }
 }

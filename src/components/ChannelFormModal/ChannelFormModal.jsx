@@ -1,49 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Modal from '../Modal/Modal'
 import useRequest from '../../hooks/useRequest'
+import useForm from '../../hooks/useForm'
 import { createChannel, updateChannel } from '../../service/channel.service'
 import { FaPlus, FaSave, FaTimes } from 'react-icons/fa'
 
 const ChannelFormModal = ({ workspaceId, channel, mode = 'create', isOpen, onClose, onRefresh }) => {
-    const [title, setTitle] = useState('')
-    const [description, setDescription] = useState('')
     const hasRefreshed = useRef(false)
 
     const { sendRequest, resetRequest, loading, error, response } = useRequest()
 
+    const { formState, handleChangeInput, setFields, resetForm, onSubmit } = useForm({
+        initialFormState: {
+            title: '',
+            description: ''
+        },
+        submitFn: async (values) => {
+            if (!values.title.trim()) return
+
+            await sendRequest({
+                requestCb: () => {
+                    if (mode === 'create') {
+                        return createChannel({ workspace_id: workspaceId, title: values.title, description: values.description })
+                    } else {
+                        return updateChannel({ 
+                            workspace_id: workspaceId, 
+                            channel_id: channel._id, 
+                            title: values.title, 
+                            description: values.description 
+                        })
+                    }
+                }
+            })
+        }
+    })
+
     useEffect(() => {
         if (isOpen) {
             if (channel && mode === 'edit') {
-                setTitle(channel.title || '')
-                setDescription(channel.description || '')
+                setFields({
+                    title: channel.title || '',
+                    description: channel.description || ''
+                })
             } else {
-                setTitle('')
-                setDescription('')
+                resetForm()
             }
             hasRefreshed.current = false
             resetRequest()
         }
     }, [channel, mode, isOpen, resetRequest])
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        if (!title.trim()) return
-
-        await sendRequest({
-            requestCb: () => {
-                if (mode === 'create') {
-                    return createChannel({ workspace_id: workspaceId, title, description })
-                } else {
-                    return updateChannel({ 
-                        workspace_id: workspaceId, 
-                        channel_id: channel._id, 
-                        title, 
-                        description 
-                    })
-                }
-            }
-        })
-    }
 
     useEffect(() => {
         let timeoutId
@@ -66,14 +71,15 @@ const ChannelFormModal = ({ workspaceId, channel, mode = 'create', isOpen, onClo
             onClose={() => !loading && onClose()}
             title={mode === 'create' ? 'Crear nuevo canal' : 'Editar canal'}
         >
-            <form className="form" onSubmit={handleSubmit}>
+            <form className="form" onSubmit={onSubmit}>
                 <div className="form-group">
                     <label className="form-label">Nombre del Canal</label>
                     <input
                         className="form-input"
                         type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        name="title"
+                        value={formState.title}
+                        onChange={handleChangeInput}
                         placeholder="Ej: # anuncios"
                         required
                         disabled={loading}
@@ -85,8 +91,9 @@ const ChannelFormModal = ({ workspaceId, channel, mode = 'create', isOpen, onClo
                     <input
                         className="form-input"
                         type="text"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        name="description"
+                        value={formState.description}
+                        onChange={handleChangeInput}
                         placeholder="¿De qué trata este canal?"
                         disabled={loading}
                     />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Modal from '../Modal/Modal'
 import useRequest from '../../hooks/useRequest'
+import useForm from '../../hooks/useForm'
 import { createMember, updateMemberRole, deleteMember } from '../../service/member.service'
 import { FaUserPlus, FaSave, FaTimes, FaPlus, FaTrash, FaEdit, FaSignOutAlt } from 'react-icons/fa'
 import DeleteConfirmModal from '../DeleteConfirmModal/DeleteConfirmModal'
@@ -9,24 +10,44 @@ import { useContext } from 'react'
 
 const MemberFormModal = ({ workspaceId, workspaceRole, member, mode = 'create', isOpen, onClose, onRefresh }) => {
     const [isEditing, setIsEditing] = useState(mode === 'edit' || mode === 'create')
-    const [email, setEmail] = useState('')
-    const [role, setRole] = useState('')
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const hasRefreshed = useRef(false)
-
 
     const { user: currentUser } = useContext(AuthContext)
     const { sendRequest, resetRequest, loading, error, response } = useRequest()
 
     const isMe = member?.user_id === currentUser?.id
 
+    const { formState, handleChangeInput, setFields, resetForm, onSubmit } = useForm({
+        initialFormState: {
+            email: '',
+            role: ''
+        },
+        submitFn: async (values) => {
+            if (mode === 'create' && !values.email.trim()) return
+            if (!values.role) return
+
+            await sendRequest({
+                requestCb: () => {
+                    if (mode === 'create') {
+                        return createMember(workspaceId, values.email, values.role)
+                    } else {
+                        return updateMemberRole(workspaceId, member.member_id, values.role)
+                    }
+                }
+            })
+        }
+    })
+
     const handleEditToggle = (e) => {
         if (e && e.preventDefault) e.preventDefault()
         resetRequest()
         if (isEditing && mode !== 'create') {
             // Cancelar edición: resetear valores
-            setEmail(member.user_email || '')
-            setRole(member.member_role || '')
+            setFields({
+                email: member.user_email || '',
+                role: member.member_role || ''
+            })
         }
         setIsEditing(!isEditing)
     }
@@ -34,34 +55,19 @@ const MemberFormModal = ({ workspaceId, workspaceRole, member, mode = 'create', 
     useEffect(() => {
         if (isOpen) {
             if (member && mode !== 'create') {
-                setEmail(member.user_email || '')
-                setRole(member.member_role || '')
+                setFields({
+                    email: member.user_email || '',
+                    role: member.member_role || ''
+                })
                 setIsEditing(mode === 'edit')
             } else {
-                setEmail('')
-                setRole('')
+                resetForm()
                 setIsEditing(true)
             }
             hasRefreshed.current = false
             resetRequest()
         }
     }, [member, mode, isOpen, resetRequest])
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        if (mode === 'create' && !email.trim()) return
-        if (!role) return
-
-        await sendRequest({
-            requestCb: () => {
-                if (mode === 'create') {
-                    return createMember(workspaceId, email, role)
-                } else {
-                    return updateMemberRole(workspaceId, member.member_id, role)
-                }
-            }
-        })
-    }
 
     useEffect(() => {
         let timeoutId
@@ -86,14 +92,15 @@ const MemberFormModal = ({ workspaceId, workspaceRole, member, mode = 'create', 
                 onClose={() => !loading && onClose()}
                 title={mode === 'create' ? 'Invitar Miembro' : mode === 'edit' ? 'Editar Miembro' : 'Detalles del Miembro'}
             >
-                <form className="form" onSubmit={handleSubmit}>
+                <form className="form" onSubmit={onSubmit}>
                     <div className="form-group">
                         <label className="form-label">Email del Usuario</label>
                         <input
                             className="form-input"
                             type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            name="email"
+                            value={formState.email}
+                            onChange={handleChangeInput}
                             placeholder="ejemplo@correo.com"
                             required
                             disabled={loading || mode !== 'create'}
@@ -105,8 +112,9 @@ const MemberFormModal = ({ workspaceId, workspaceRole, member, mode = 'create', 
                         <label className="form-label">Rol en el Espacio</label>
                         <select
                             className="form-input"
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
+                            name="role"
+                            value={formState.role}
+                            onChange={handleChangeInput}
                             required
                             disabled={loading || !isEditing}
                         >
