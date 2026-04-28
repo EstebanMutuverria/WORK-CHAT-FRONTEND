@@ -28,6 +28,7 @@ const ProfileScreen = () => {
 
     function onCancel() {
         setIsEditing(false)
+        setFields(initialFormState)
     }
 
     const {
@@ -125,10 +126,31 @@ const ProfileScreen = () => {
                                 </>
                             ) : (
                                 <>
+                                    {
+                                        error && (
+                                            <div className="alert alert--error">
+                                                {error.message || 'Error al actualizar el perfil'}
+                                            </div>
+                                        )
+                                    }
+                                    {
+                                        response && !response.ok && (
+                                            <div className="alert alert--error">
+                                                {response.message || 'Error al actualizar el perfil'}
+                                            </div>
+                                        )
+                                    }
+                                    {
+                                        response && response.ok && (
+                                            <div className="alert alert--success">
+                                                {response.message || 'Perfil actualizado correctamente'}
+                                            </div>
+                                        )
+                                    }
                                     <button type="button" className="btn btn--secondary profile-btn--cancel" onClick={onCancel}>
                                         <span>X</span> Cancelar
                                     </button>
-                                    <button type="submit" className="btn btn--primary profile-btn--save" disabled={loading}>
+                                    <button type="submit" className="btn btn--primary profile-btn--save" disabled={loading || formState[PROFILE_USER_FIELD_NAMES.NAME] === ''}>
                                         <span>💾</span> {loading ? 'Guardando...' : 'Guardar'}
                                     </button>
                                 </>
