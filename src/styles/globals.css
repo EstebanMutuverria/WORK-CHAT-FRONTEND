@@ -53,6 +53,35 @@
   --color-border: rgba(255, 255, 255, 0.1);
   --color-border-focus: #1d9bd1;
 
+  /* Modal Design Tokens */
+  --modal-bg: var(--color-bg-surface);
+  --modal-border-radius: 24px;
+  --modal-max-width: 440px;
+  --modal-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  --modal-overlay-bg: rgba(10, 10, 12, 0.6);
+  --modal-overlay-blur: 16px;
+  --modal-padding: var(--space-6);
+
+  /* Action Buttons Tokens */
+  --btn-height: 44px;
+  --btn-radius: var(--radius-md);
+  --btn-font-size: var(--font-size-base);
+  --btn-font-weight: var(--font-weight-semibold);
+  --btn-transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* Danger Button Tokens */
+  --color-danger: #e01e5a;
+  --color-danger-hover: #c0153e;
+  --color-danger-shadow: rgba(224, 30, 90, 0.25);
+
+  /* Form Field Tokens */
+  --input-height: 44px;
+  --input-bg: var(--color-bg-input);
+  --input-border: 1.5px solid var(--color-border);
+  --input-radius: var(--radius-md);
+  --input-focus-border: var(--color-border-focus);
+  --input-focus-shadow: var(--shadow-glow);
+
   /* Spacing scale */
   --space-1: 4px;
   --space-2: 8px;
@@ -319,17 +348,24 @@ ol {
 
 .form-input {
   width: 100%;
-  height: 44px;
+  height: var(--input-height);
   padding: 0 var(--space-4);
-  background: var(--color-bg-input);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  border: var(--input-border);
+  border-radius: var(--input-radius);
   color: var(--color-text-primary);
   font-size: var(--font-size-base);
   transition: border-color var(--transition-base),
     box-shadow var(--transition-base),
     background var(--transition-base);
   outline: none;
+}
+
+.form-textarea {
+  padding: var(--space-3) var(--space-4);
+  height: auto;
+  min-height: 100px;
+  resize: vertical;
 }
 
 /* Specific styles for select to make it look premium */
@@ -394,16 +430,13 @@ select.form-input option {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  height: 44px;
+  height: var(--btn-height);
   padding: 0 var(--space-5);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  border-radius: var(--radius-md);
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
+  border-radius: var(--btn-radius);
   border: 1.5px solid transparent;
-  transition: background var(--transition-fast),
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast),
-    opacity var(--transition-fast);
+  transition: var(--btn-transition);
   outline: none;
   position: relative;
   overflow: hidden;
@@ -426,7 +459,7 @@ select.form-input option {
 }
 
 .btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 /* Variantes */
@@ -452,6 +485,29 @@ select.form-input option {
   background: var(--color-bg-hover);
   border-color: rgba(255, 255, 255, 0.2);
   text-decoration: none;
+}
+
+.btn--danger {
+  color: var(--color-danger);
+  border-color: rgba(224, 30, 90, 0.2);
+}
+
+.btn--danger:hover {
+  background: rgba(224, 30, 90, 0.1);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.btn--danger-solid {
+  background: var(--color-danger);
+  color: white;
+  box-shadow: 0 4px 12px var(--color-danger-shadow);
+}
+
+.btn--danger-solid:hover {
+  background: var(--color-danger-hover);
+  box-shadow: 0 6px 16px var(--color-danger-shadow);
+  transform: translateY(-1px);
 }
 
 .btn--ghost {

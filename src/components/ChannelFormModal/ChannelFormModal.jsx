@@ -8,39 +8,61 @@ import { FaPlus, FaSave, FaTimes } from 'react-icons/fa'
 const ChannelFormModal = ({ workspaceId, channel, mode = 'create', isOpen, onClose, onRefresh }) => {
     const hasRefreshed = useRef(false)
 
-    const { sendRequest, resetRequest, loading, error, response } = useRequest()
+    const CHANNEL_FORM_FIELDS = {
+        TITLE: 'title',
+        DESCRIPTION: 'description'
+    }
 
-    const { formState, handleChangeInput, setFields, resetForm, onSubmit } = useForm({
-        initialFormState: {
-            title: '',
-            description: ''
-        },
-        submitFn: async (values) => {
-            if (!values.title.trim()) return
+    const initialFormState = {
+        [CHANNEL_FORM_FIELDS.TITLE]: '',
+        [CHANNEL_FORM_FIELDS.DESCRIPTION]: ''
+    }
 
-            await sendRequest({
-                requestCb: () => {
-                    if (mode === 'create') {
-                        return createChannel({ workspace_id: workspaceId, title: values.title, description: values.description })
-                    } else {
-                        return updateChannel({ 
-                            workspace_id: workspaceId, 
-                            channel_id: channel._id, 
-                            title: values.title, 
-                            description: values.description 
-                        })
-                    }
+    const {
+        sendRequest, //Funcion para activar una consulta al servidor
+        resetRequest, //Funcion para limpiar los estados
+        response, //Estado que guarda el estado de respuesta del servidor
+        error, //Estado que guarda el estado de error del servidor
+        loading //Estado que guarda el estado de cargando del servidor
+    } = useRequest()
+
+    const {
+        handleChangeInput,
+        onSubmit,
+        formState,
+        setFields,
+        resetForm
+    } = useForm({ initialFormState, submitFn: onSaveChannel })
+
+    async function onSaveChannel(formState) {
+        if (!formState[CHANNEL_FORM_FIELDS.TITLE].trim()) return
+
+        await sendRequest({
+            requestCb: () => {
+                if (mode === 'create') {
+                    return createChannel({
+                        workspace_id: workspaceId,
+                        title: formState[CHANNEL_FORM_FIELDS.TITLE],
+                        description: formState[CHANNEL_FORM_FIELDS.DESCRIPTION]
+                    })
+                } else {
+                    return updateChannel({
+                        workspace_id: workspaceId,
+                        channel_id: channel._id,
+                        title: formState[CHANNEL_FORM_FIELDS.TITLE],
+                        description: formState[CHANNEL_FORM_FIELDS.DESCRIPTION]
+                    })
                 }
-            })
-        }
-    })
+            }
+        })
+    }
 
     useEffect(() => {
         if (isOpen) {
             if (channel && mode === 'edit') {
                 setFields({
-                    title: channel.title || '',
-                    description: channel.description || ''
+                    [CHANNEL_FORM_FIELDS.TITLE]: channel.title || '',
+                    [CHANNEL_FORM_FIELDS.DESCRIPTION]: channel.description || ''
                 })
             } else {
                 resetForm()
@@ -73,12 +95,13 @@ const ChannelFormModal = ({ workspaceId, channel, mode = 'create', isOpen, onClo
         >
             <form className="form" onSubmit={onSubmit}>
                 <div className="form-group">
-                    <label className="form-label">Nombre del Canal</label>
+                    <label className="form-label" htmlFor={CHANNEL_FORM_FIELDS.TITLE}>Nombre del Canal</label>
                     <input
                         className="form-input"
                         type="text"
-                        name="title"
-                        value={formState.title}
+                        id={CHANNEL_FORM_FIELDS.TITLE}
+                        name={CHANNEL_FORM_FIELDS.TITLE}
+                        value={formState[CHANNEL_FORM_FIELDS.TITLE]}
                         onChange={handleChangeInput}
                         placeholder="Ej: # anuncios"
                         required
@@ -87,12 +110,13 @@ const ChannelFormModal = ({ workspaceId, channel, mode = 'create', isOpen, onClo
                 </div>
 
                 <div className="form-group">
-                    <label className="form-label">Descripción (Opcional)</label>
+                    <label className="form-label" htmlFor={CHANNEL_FORM_FIELDS.DESCRIPTION}>Descripción (Opcional)</label>
                     <input
                         className="form-input"
                         type="text"
-                        name="description"
-                        value={formState.description}
+                        id={CHANNEL_FORM_FIELDS.DESCRIPTION}
+                        name={CHANNEL_FORM_FIELDS.DESCRIPTION}
+                        value={formState[CHANNEL_FORM_FIELDS.DESCRIPTION]}
                         onChange={handleChangeInput}
                         placeholder="¿De qué trata este canal?"
                         disabled={loading}

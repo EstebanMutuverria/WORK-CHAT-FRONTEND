@@ -10,10 +10,15 @@ const AuthMiddleware = () => {
         const validateSession = async () => {
             const token = localStorage.getItem(LOCALSTORAGE_TOKEN_KEY)
             if (token) {
-                const response = await verifyToken(token)
-                if (response.status === 401) {
-                    console.error("Usuario no encontrado o sesión inválida")
-                    logout()
+                try {
+                    const response = await verifyToken(token)
+                    if (response.status === 401) {
+                        console.error("Usuario no encontrado o sesión inválida")
+                        logout()
+                    }
+                } catch (error) {
+                    console.error("Error al validar la sesión:", error)
+                    // No hacemos logout aquí por errores de red (ej: servidor caído)
                 }
             }
         }

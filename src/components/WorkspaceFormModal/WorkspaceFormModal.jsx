@@ -23,46 +23,66 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
     const hasRefreshed = useRef(false)
     const fileInputRef = useRef(null)
 
-    const { sendRequest: sendSubmit, resetRequest, loading: submitting, error: submitError, response: submitResponse } = useRequest()
+    const WORKSPACE_FORM_FIELDS = {
+        TITLE: 'title',
+        DESCRIPTION: 'description',
+        IMAGE: 'image',
+        IMAGE_PREVIEW: 'imagePreview'
+    }
 
-    const { formState, handleChangeInput, setFields, resetForm, onSubmit } = useForm({
-        initialFormState: {
-            title: '',
-            description: '',
-            image: null,
-            imagePreview: null
-        },
-        submitFn: async (values) => {
-            if (mode === 'create' || !workspace) {
-                await sendSubmit({
-                    requestCb: () => createWorkspace({
-                        title: values.title,
-                        description: values.description,
-                        image: values.image
-                    })
+    const {
+        sendRequest, //Funcion para activar una consulta al servidor
+        resetRequest, //Funcion para limpiar los estados
+        response, //Estado que guarda el estado de respuesta del servidor
+        error, //Estado que guarda el estado de error del servidor
+        loading //Estado que guarda el estado de cargando del servidor
+    } = useRequest()
+
+    const initialFormState = {
+        [WORKSPACE_FORM_FIELDS.TITLE]: '',
+        [WORKSPACE_FORM_FIELDS.DESCRIPTION]: '',
+        [WORKSPACE_FORM_FIELDS.IMAGE]: null,
+        [WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW]: null
+    }
+
+    const {
+        handleChangeInput,
+        onSubmit,
+        formState,
+        setFields,
+        resetForm
+    } = useForm({ initialFormState, submitFn: onSaveWorkspace })
+
+    async function onSaveWorkspace(formState) {
+        if (mode === 'create' || !workspace) {
+            await sendRequest({
+                requestCb: () => createWorkspace({
+                    title: formState[WORKSPACE_FORM_FIELDS.TITLE],
+                    description: formState[WORKSPACE_FORM_FIELDS.DESCRIPTION],
+                    image: formState[WORKSPACE_FORM_FIELDS.IMAGE]
                 })
-            } else {
-                await sendSubmit({
-                    requestCb: () => updateWorkspace({
-                        workspace_id: workspace.workspace_id,
-                        title: values.title,
-                        description: values.description,
-                        image: values.image,
-                    })
+            })
+        } else {
+            await sendRequest({
+                requestCb: () => updateWorkspace({
+                    workspace_id: workspace.workspace_id,
+                    title: formState[WORKSPACE_FORM_FIELDS.TITLE],
+                    description: formState[WORKSPACE_FORM_FIELDS.DESCRIPTION],
+                    image: formState[WORKSPACE_FORM_FIELDS.IMAGE],
                 })
-            }
+            })
         }
-    })
+    }
 
     // Sincronizar estado con el workspace recibido o resetear para creación
     useEffect(() => {
         if (isOpen) {
             if (workspace && mode !== 'create') {
                 setFields({
-                    title: workspace.workspace_title || '',
-                    description: workspace.workspace_description || '',
-                    image: null,
-                    imagePreview: null
+                    [WORKSPACE_FORM_FIELDS.TITLE]: workspace.workspace_title || '',
+                    [WORKSPACE_FORM_FIELDS.DESCRIPTION]: workspace.workspace_description || '',
+                    [WORKSPACE_FORM_FIELDS.IMAGE]: null,
+                    [WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW]: null
                 })
                 setIsEditing(mode === 'edit')
             } else {
@@ -80,10 +100,10 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
         if (isEditing && mode !== 'create') {
             // Cancelar edición: resetear valores
             setFields({
-                title: workspace.workspace_title || '',
-                description: workspace.workspace_description || '',
-                image: null,
-                imagePreview: null
+                [WORKSPACE_FORM_FIELDS.TITLE]: workspace.workspace_title || '',
+                [WORKSPACE_FORM_FIELDS.DESCRIPTION]: workspace.workspace_description || '',
+                [WORKSPACE_FORM_FIELDS.IMAGE]: null,
+                [WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW]: null
             })
         }
         setIsEditing(!isEditing)
@@ -92,7 +112,7 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
     // Efecto para manejar el éxito
     useEffect(() => {
         let timeoutId
-        if (submitResponse && submitResponse.ok && !hasRefreshed.current) {
+        if (response && response.ok && !hasRefreshed.current) {
             hasRefreshed.current = true
             timeoutId = setTimeout(() => {
                 onRefresh()
@@ -104,14 +124,14 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
             }, 1000)
         }
 
-        if (!submitResponse) {
+        if (!response) {
             hasRefreshed.current = false
         }
 
         return () => {
             if (timeoutId) clearTimeout(timeoutId)
         }
-    }, [submitResponse, onRefresh, onClose, mode])
+    }, [response, onRefresh, onClose, mode])
 
     const currentImage = workspace?.workspace_image?.startsWith('http')
         ? workspace.workspace_image
@@ -131,7 +151,7 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
             <Modal
                 isOpen={isOpen}
                 onClose={() => {
-                    if (!submitting) onClose()
+                    if (!loading) onClose()
                 }}
                 title={modalTitle}
             >
@@ -139,15 +159,15 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                     <form onSubmit={onSubmit}>
                         <div className="ws-form__header">
                             <div className="ws-form__image-container">
-                                {formState.imagePreview || currentImage ? (
+                                {formState[WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW] || currentImage ? (
                                     <img
-                                        src={formState.imagePreview || currentImage}
-                                        alt={formState.title}
+                                        src={formState[WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW] || currentImage}
+                                        alt={formState[WORKSPACE_FORM_FIELDS.TITLE]}
                                         className="ws-form__img"
                                     />
                                 ) : (
                                     <div className="ws-form__initials">
-                                        {getInitials(formState.title)}
+                                        {getInitials(formState[WORKSPACE_FORM_FIELDS.TITLE])}
                                     </div>
                                 )}
 
@@ -156,14 +176,14 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                                         className="ws-form__image-edit"
                                         onClick={() => fileInputRef.current.click()}
                                         type="button"
-                                        disabled={submitting}
+                                        disabled={loading}
                                     >
                                         <FaCamera />
                                     </button>
                                 )}
                                 <input
                                     type="file"
-                                    name="image"
+                                    name={WORKSPACE_FORM_FIELDS.IMAGE}
                                     ref={fileInputRef}
                                     style={{ display: 'none' }}
                                     onChange={handleChangeInput}
@@ -176,37 +196,39 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
 
                         <div className="ws-form__fields">
                             <div className="form-group">
-                                <label className="form-label">Nombre del Espacio</label>
+                                <label className="form-label" htmlFor={WORKSPACE_FORM_FIELDS.TITLE}>Nombre del Espacio</label>
                                 <input
                                     type="text"
-                                    name="title"
+                                    id={WORKSPACE_FORM_FIELDS.TITLE}
+                                    name={WORKSPACE_FORM_FIELDS.TITLE}
                                     className="form-input"
-                                    value={formState.title}
+                                    value={formState[WORKSPACE_FORM_FIELDS.TITLE]}
                                     onChange={handleChangeInput}
                                     readOnly={!isEditing}
                                     placeholder="Ej: Equipo de Desarrollo"
-                                    disabled={submitting}
+                                    disabled={loading}
                                     required
                                 />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Descripción</label>
+                                <label className="form-label" htmlFor={WORKSPACE_FORM_FIELDS.DESCRIPTION}>Descripción</label>
                                 <textarea
-                                    name="description"
+                                    id={WORKSPACE_FORM_FIELDS.DESCRIPTION}
+                                    name={WORKSPACE_FORM_FIELDS.DESCRIPTION}
                                     className="form-textarea form-input"
-                                    value={formState.description}
+                                    value={formState[WORKSPACE_FORM_FIELDS.DESCRIPTION]}
                                     onChange={handleChangeInput}
                                     readOnly={!isEditing}
                                     placeholder="¿Misión del equipo?"
                                     rows="3"
-                                    disabled={submitting}
+                                    disabled={loading}
                                     required
                                 />
                             </div>
                         </div>
 
-                        {submitError && <div className="alert alert--error">{submitError.message || 'Error en la operación'}</div>}
-                        {submitResponse && submitResponse.ok && (
+                        {error && <div className="alert alert--error">{error.message || 'Error en la operación'}</div>}
+                        {response && response.ok && (
                             <div className="alert alert--success">
                                 {mode === 'create' ? '¡Espacio creado con éxito!' : '¡Cambios guardados!'}
                             </div>
@@ -234,13 +256,13 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                             ) : (
                                 <>
                                     {mode !== 'create' && (
-                                        <button type="button" className="btn btn--secondary" onClick={handleEditToggle} disabled={submitting}>
+                                        <button type="button" className="btn btn--secondary" onClick={handleEditToggle} disabled={loading}>
                                             <FaTimes /> Cancelar
                                         </button>
                                     )}
-                                    <button type="submit" className="btn btn--primary" disabled={submitting}>
+                                    <button type="submit" className="btn btn--primary" disabled={loading}>
                                         {mode === 'create' ? <FaPlus /> : <FaSave />}
-                                        {submitting ? 'Procesando...' : (mode === 'create' ? 'Crear Espacio' : 'Guardar Cambios')}
+                                        {loading ? 'Procesando...' : (mode === 'create' ? 'Crear Espacio' : 'Guardar Cambios')}
                                     </button>
                                 </>
                             )}
@@ -254,7 +276,7 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                     isOpen={showDeleteConfirm}
                     onClose={() => setShowDeleteConfirm(false)}
                     onConfirm={async () => {
-                        await sendSubmit({
+                        await sendRequest({
                             requestCb: () => deleteWorkspace({ workspace_id: workspace.workspace_id })
                         })
                         setShowDeleteConfirm(false)
@@ -262,7 +284,7 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                     }}
                     title="¿Eliminar espacio?"
                     message={<p>¿Seguro que quieres borrar <strong>{workspace.workspace_title}</strong>? Esta acción es irreversible.</p>}
-                    loading={submitting}
+                    loading={loading}
                 />
             )}
         </>

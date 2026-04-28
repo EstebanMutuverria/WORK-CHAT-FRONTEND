@@ -4,9 +4,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(10, 10, 12, 0.6);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background-color: var(--modal-overlay-bg);
+    backdrop-filter: blur(var(--modal-overlay-blur));
+    -webkit-backdrop-filter: blur(var(--modal-overlay-blur));
     display: grid;
     place-items: center;
     z-index: 1000;
@@ -15,12 +15,12 @@
 }
 
 .modal-content {
-    background: var(--color-bg-surface);
+    background: var(--modal-bg);
     width: 100%;
-    max-width: 440px;
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.08); /* Ghost border minimalista */
-    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+    max-width: var(--modal-max-width);
+    border-radius: var(--modal-border-radius);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--modal-shadow);
     overflow: hidden;
     position: relative;
     transform-origin: center calc(50% + 20px);
@@ -28,7 +28,7 @@
 }
 
 .modal-header {
-    padding: var(--space-6) var(--space-6) var(--space-2);
+    padding: var(--modal-padding) var(--modal-padding) var(--space-2);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -36,7 +36,7 @@
 
 .modal-title {
     font-size: var(--font-size-lg);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
     letter-spacing: -0.02em;
 }
@@ -51,17 +51,17 @@
     align-items: center;
     justify-content: center;
     background: transparent;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: var(--btn-transition);
 }
 
 .modal-close-btn:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--color-bg-hover);
     color: var(--color-text-primary);
     transform: rotate(90deg) scale(1.1);
 }
 
 .modal-body {
-    padding: var(--space-2) var(--space-6) var(--space-8);
+    padding: var(--space-2) var(--modal-padding) var(--space-8);
 }
 
 @keyframes overlay-fade-in {
@@ -72,8 +72,8 @@
     }
     to { 
         opacity: 1; 
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(var(--modal-overlay-blur));
+        -webkit-backdrop-filter: blur(var(--modal-overlay-blur));
     }
 }
 

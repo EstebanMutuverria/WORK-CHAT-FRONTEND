@@ -80,6 +80,11 @@ function AuthContextProvider({ children }) {
         return () => window.removeEventListener('force-logout', handleForceLogout)
     }, [logout])
 
+    function updateUserContext(new_data) {
+        setUser({ ...user, ...new_data })
+    }
+
+
     const providerValues = {
         isLogged,
         user,
@@ -87,7 +92,8 @@ function AuthContextProvider({ children }) {
         setIsLogged,
         setShowIntro,
         manageLogin,
-        logout
+        logout,
+        updateUserContext
     }
     return (
         <AuthContext.Provider value={providerValues}>

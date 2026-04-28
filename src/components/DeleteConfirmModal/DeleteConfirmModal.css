@@ -13,17 +13,17 @@
 
 .delete-confirm__text strong {
     color: var(--color-text-primary);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .delete-confirm__warning {
     padding: var(--space-4);
-    background: rgba(224, 30, 90, 0.08); /* Minimalist ghostly background */
+    background: rgba(224, 30, 90, 0.08);
     border-radius: var(--radius-lg);
-    color: var(--color-error);
+    color: var(--color-danger);
     font-size: var(--font-size-sm);
     line-height: 1.5;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .delete-confirm__actions {
@@ -32,18 +32,4 @@
     margin-top: var(--space-4);
 }
 
-.btn--danger-solid {
-    background: var(--color-error);
-    color: white;
-    flex: 1;
-    border: none;
-    box-shadow: 0 4px 12px rgba(224, 30, 90, 0.2);
-    /* Se apoya en propiedades base de .btn */
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.btn--danger-solid:hover {
-    background: #c0153e;
-    box-shadow: 0 6px 16px rgba(224, 30, 90, 0.4);
-    transform: translateY(-1px);
-}
+/* El botón .btn--danger-solid ahora es global en globals.css */
