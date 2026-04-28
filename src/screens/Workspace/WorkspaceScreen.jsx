@@ -8,6 +8,10 @@ import { getChannelsByWorkspaceId } from '../../service/channel.service.js'
 import ChannelFormModal from '../../components/ChannelFormModal/ChannelFormModal'
 import MemberFormModal from '../../components/MemberFormModal/MemberFormModal'
 import { FaPlus, FaCog, FaHashtag } from 'react-icons/fa'
+import MessageList from '../../components/Messages/MessageList.jsx'
+import MessageInput from '../../components/Messages/MessageInput.jsx'
+import DeleteConfirmModal from '../../components/DeleteConfirmModal/DeleteConfirmModal'
+import useMessages from '../../hooks/useMessages'
 
 const WorkspaceScreen = () => {
     const { workspace_id, channel_id } = useParams()
@@ -39,6 +43,24 @@ const WorkspaceScreen = () => {
         loading
     } = useRequest()
 
+    // Se calcula ANTES de llamar a useMessages porque necesitamos el ID resuelto.
+    // Si el usuario entra a /workspaces/:id sin canal en la URL, channel_id es undefined
+    // y selectedChannel cae en el primer canal de la lista.
+    const channels = response?.data?.channels || []
+    const selectedChannel = channels.find(ch => ch._id === channel_id) || channels[0]
+    const effectiveChannelId = selectedChannel?._id
+
+    const {
+        messages,
+        loading: messagesLoading,
+        fetchMessages,
+        handleRequestDelete,
+        handleConfirmDelete,
+        handleCloseDeleteModal,
+        isDeleteModalOpen,
+        deleteLoading,
+    } = useMessages({ workspace_id, channel_id: effectiveChannelId })
+
     const handleRefresh = () => {
         sendRequest({
             requestCb: async () => {
@@ -60,6 +82,12 @@ const WorkspaceScreen = () => {
     useEffect(() => {
         handleRefresh()
     }, [workspace_id])
+
+    useEffect(() => {
+        fetchMessages()
+    // effectiveChannelId cambia cuando: llega el canal de la URL, o cuando
+    // los canales cargan y se selecciona el primero por defecto.
+    }, [workspace_id, effectiveChannelId])
 
     useEffect(() => {
         const handleResize = () => {
@@ -132,9 +160,7 @@ const WorkspaceScreen = () => {
 
     const workspace = response?.data?.workspace
     const members = response?.data?.members || []
-    const channels = response?.data?.channels || []
-    const selectedChannel = channels.find(channel => channel._id === channel_id) || channels[0]
-    const selectedMember = members.find(member => member.member_id === member_id);
+    const selectedMember = members.find(member => member.member_id === member_id)
 
     return (
         <div className={`workspace-layout ${!isSidebarVisible ? 'sidebar-hidden' : ''}`}>
@@ -273,25 +299,23 @@ const WorkspaceScreen = () => {
                                     </p>
                                 </div>
                             </div>
+                            <MessageList
+                                messages={messages}
+                                onDelete={handleRequestDelete}
+                                loading={messagesLoading}
+                            />
                         </div>
                     ) : null
                 }
 
-                {channels.length > 0 && (
-                    <form className="chat-input-container">
-                        <div className="chat-input-wrapper">
-                            <textarea
-                                className="chat-input"
-                                placeholder={`Escribe un mensaje en #${selectedChannel?.title || ''}`}
-                                rows={1}
-                            ></textarea>
-                            <div className="chat-input-actions">
-                                <button type='submit' className="btn-send">
-                                    Enviar
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                {channels.length > 0 && selectedChannel && (
+                    <div className="chat-input-container">
+                        <MessageInput
+                            workspace_id={workspace_id}
+                            channel_id={selectedChannel._id}
+                            onMessageSent={fetchMessages}
+                        />
+                    </div>
                 )}
             </main>
 
@@ -312,6 +336,16 @@ const WorkspaceScreen = () => {
                 workspaceRole={workspace?.workspace_role}
                 onClose={() => setIsMemberModalOpen(false)}
                 onRefresh={handleRefresh}
+            />
+
+            <DeleteConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={handleCloseDeleteModal}
+                onConfirm={handleConfirmDelete}
+                title="Eliminar mensaje"
+                message="¿Estás seguro de que querés eliminar este mensaje?"
+                confirmText="Sí, eliminar"
+                loading={deleteLoading}
             />
         </div>
     )

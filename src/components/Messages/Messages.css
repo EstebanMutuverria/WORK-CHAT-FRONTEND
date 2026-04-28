@@ -1,0 +1,189 @@
+/* Messages.css */
+
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) 0;
+    overflow-y: auto;
+    height: 100%;
+}
+
+/* MESSAGE ITEM */
+.message-item {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-5);
+    transition: background var(--transition-fast);
+    position: relative;
+    animation: message-appear 0.3s ease-out;
+}
+
+@keyframes message-appear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-item:hover {
+    background: var(--color-bg-hover);
+}
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    background: var(--color-brand-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+.message-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.message-header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+}
+
+.message-author {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+}
+
+.message-author:hover {
+    text-decoration: underline;
+}
+
+.message-time {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.message-text {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    word-break: break-word;
+}
+
+.message-actions {
+    position: absolute;
+    right: var(--space-5);
+    top: var(--space-1);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    display: flex;
+    box-shadow: var(--shadow-sm);
+}
+
+.message-item:hover .message-actions {
+    opacity: 1;
+}
+
+.action-btn {
+    padding: var(--space-1) var(--space-2);
+    color: var(--color-text-secondary);
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-error);
+}
+
+/* MESSAGE INPUT */
+.message-input-container {
+    width: 100%;
+}
+
+.message-input-form {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    overflow: hidden;
+}
+
+.message-input-form:focus-within {
+    border-color: var(--color-text-muted);
+    box-shadow: 0 0 0 1px var(--color-text-muted);
+}
+
+.message-input-field {
+    background: transparent;
+    border: none;
+    color: var(--color-text-primary);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-base);
+    outline: none;
+    resize: none;
+    min-height: 44px;
+    max-height: 200px;
+}
+
+.message-input-controls {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--space-1) var(--space-2);
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid var(--color-border);
+}
+
+.send-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-on-brand);
+    background: var(--color-success);
+    transition: all var(--transition-fast);
+    opacity: 0.6;
+}
+
+.send-btn:not(:disabled) {
+    opacity: 1;
+}
+
+.send-btn:not(:disabled):hover {
+    background: #249163;
+    transform: scale(1.05);
+}
+
+.send-btn:active {
+    transform: scale(0.95);
+}
+
+.send-btn svg {
+    width: 18px;
+    height: 18px;
+}
