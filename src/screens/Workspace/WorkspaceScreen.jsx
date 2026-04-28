@@ -12,6 +12,7 @@ import MessageList from '../../components/Messages/MessageList.jsx'
 import MessageInput from '../../components/Messages/MessageInput.jsx'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal/DeleteConfirmModal'
 import useMessages from '../../hooks/useMessages'
+import { IoIosArrowBack } from "react-icons/io";
 
 const WorkspaceScreen = () => {
     const { workspace_id, channel_id } = useParams()
@@ -85,8 +86,8 @@ const WorkspaceScreen = () => {
 
     useEffect(() => {
         fetchMessages()
-    // effectiveChannelId cambia cuando: llega el canal de la URL, o cuando
-    // los canales cargan y se selecciona el primero por defecto.
+        // effectiveChannelId cambia cuando: llega el canal de la URL, o cuando
+        // los canales cargan y se selecciona el primero por defecto.
     }, [workspace_id, effectiveChannelId])
 
     useEffect(() => {
@@ -235,7 +236,7 @@ const WorkspaceScreen = () => {
                             {members.map(member => (
                                 member.member_acceptInvitation === 'accepted' && (
                                     <div key={member.member_id}>
-                                        <button className='sidebar-item' onClick={(e) => handleOpenMember(e, member)}>
+                                        <button className='sidebar-item sidebar-item--members' onClick={(e) => handleOpenMember(e, member)}>
                                             <div className="sidebar-item__avatar-wrapper">
                                                 <div className="sidebar-item__avatar">
                                                     {(member.user_name ? member.user_name[0] : 'U').toUpperCase()}
@@ -272,6 +273,10 @@ const WorkspaceScreen = () => {
                             )}
                         </h2>
                     )}
+                    <Link className='btn btn--secondary header__back-btn' to={`/home`}>
+                        <IoIosArrowBack />
+                        <span>Inicio</span>
+                    </Link>
                 </header>
                 {
                     channels.length === 0 ? (
