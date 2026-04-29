@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import ReactDOM from 'react-dom'
 import './Modal.css'
 import { IoClose } from "react-icons/io5";
 
@@ -21,7 +22,7 @@ const Modal = ({ children, title, isOpen, onClose }) => {
 
     if (!isOpen) return null
 
-    return (
+    return ReactDOM.createPortal(
         <div className="modal-overlay" onClick={onClose}>
             <div 
                 className="modal-content" 
@@ -37,7 +38,8 @@ const Modal = ({ children, title, isOpen, onClose }) => {
                     {children}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
 

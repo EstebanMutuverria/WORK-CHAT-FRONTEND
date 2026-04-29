@@ -17,3 +17,17 @@ export async function updateUser(name, user_id) {
     const response = await response_http.json()
     return response
 }
+
+export async function deleteUser(user_id) {
+    const response_http = await authenticatedFetch(
+        ENVIRONMENT.API_URL + `/api/user/${user_id}`,
+        {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+    )
+    const response = await response_http.json()
+    return response
+}

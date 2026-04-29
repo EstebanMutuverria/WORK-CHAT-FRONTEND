@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router'
 import Modal from '../Modal/Modal'
 import useRequest from '../../hooks/useRequest'
 import useForm from '../../hooks/useForm'
@@ -9,6 +10,7 @@ import { AuthContext } from '../../context/AuthContext'
 import { useContext } from 'react'
 
 const MemberFormModal = ({ workspaceId, workspaceRole, member, mode = 'create', isOpen, onClose, onRefresh }) => {
+    const navigate = useNavigate()
     const [isEditing, setIsEditing] = useState(mode === 'edit' || mode === 'create')
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const hasRefreshed = useRef(false)
@@ -93,7 +95,11 @@ const MemberFormModal = ({ workspaceId, workspaceRole, member, mode = 'create', 
         if (response && response.ok && !hasRefreshed.current) {
             hasRefreshed.current = true
             timeoutId = setTimeout(() => {
-                onRefresh()
+                if (isMe) {
+                    navigate('/home')
+                } else {
+                    onRefresh()
+                }
                 onClose()
             }, 1000)
         }
@@ -101,7 +107,7 @@ const MemberFormModal = ({ workspaceId, workspaceRole, member, mode = 'create', 
         return () => {
             if (timeoutId) clearTimeout(timeoutId)
         }
-    }, [response, onRefresh, onClose])
+    }, [response, onRefresh, onClose, isMe, navigate])
 
     return (
         <>
@@ -168,15 +174,10 @@ const MemberFormModal = ({ workspaceId, workspaceRole, member, mode = 'create', 
 
                                     </>
                                 )}
-                                {(isMe && member?.member_role !== 'owner') && (
+                                {isMe && (
                                     <button type="button" className="btn btn--danger" onClick={() => setShowDeleteConfirm(true)}>
                                         <FaSignOutAlt /> Salir del workspace
                                     </button>
-                                )}
-                                {(isMe && member?.member_role === 'owner') && (
-                                    <p className="text-muted" style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
-                                        Como dueño, no puedes abandonar el espacio sin antes transferir la propiedad.
-                                    </p>
                                 )}
                                 {(workspaceRole === 'user' && !isMe) && (
                                     <button type="button" className="btn btn--secondary" onClick={onClose}>
@@ -216,7 +217,11 @@ const MemberFormModal = ({ workspaceId, workspaceRole, member, mode = 'create', 
                         title={isMe ? "¿Salir del espacio de trabajo?" : "¿Eliminar miembro?"}
                         message={
                             isMe ? (
-                                <p>¿Seguro que quieres <strong>salir</strong> de este espacio de trabajo? Perderás acceso a todos los canales.</p>
+                                member?.member_role === 'owner' ? (
+                                    <p>Como <strong>dueño</strong>, al salir se transferirá la propiedad automáticamente al miembro más antiguo o si eres el unico miembro se eliminará el espacio de trabajo automaticamente. ¿Deseas continuar?</p>
+                                ) : (
+                                    <p>¿Seguro que quieres <strong>salir</strong> de este espacio de trabajo? Perderás acceso a todos los canales.</p>
+                                )
                             ) : (
                                 <p>¿Seguro que quieres eliminar a <strong>{member.user_name}</strong>? Esta acción es irreversible.</p>
                             )

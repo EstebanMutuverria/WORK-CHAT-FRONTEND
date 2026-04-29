@@ -110,7 +110,7 @@ const ChannelFormModal = ({ workspaceId, channel, mode = 'create', isOpen, onClo
                 </div>
 
                 <div className="form-group">
-                    <label className="form-label" htmlFor={CHANNEL_FORM_FIELDS.DESCRIPTION}>Descripción (Opcional)</label>
+                    <label className="form-label" htmlFor={CHANNEL_FORM_FIELDS.DESCRIPTION}>Descripción</label>
                     <input
                         className="form-input"
                         type="text"

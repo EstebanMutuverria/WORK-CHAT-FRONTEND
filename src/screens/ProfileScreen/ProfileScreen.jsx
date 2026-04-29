@@ -4,7 +4,8 @@ import { Link } from 'react-router'
 import './ProfileScreen.css'
 import useForm from '../../hooks/useForm'
 import useRequest from '../../hooks/useRequest'
-import { updateUser } from '../../service/user.service.js'
+import { updateUser, deleteUser } from '../../service/user.service.js'
+import DeleteConfirmModal from '../../components/DeleteConfirmModal/DeleteConfirmModal'
 
 
 const ProfileScreen = () => {
@@ -16,9 +17,11 @@ const ProfileScreen = () => {
     const { user, logout, updateUserContext } = useContext(AuthContext)
 
     const [isEditing, setIsEditing] = useState(false)
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
 
     function onEdit() {
+        resetRequest()
         setIsEditing(true)
     }
 
@@ -67,6 +70,19 @@ const ProfileScreen = () => {
         })
         setIsEditing(false)
     }
+    
+    async function handleDeleteAccount() {
+        await sendRequest({
+            requestCb: async () => {
+                const response = await deleteUser(user.id)
+                if (response.ok) {
+                    logout()
+                }
+                return response
+            }
+        })
+        setIsDeleteModalOpen(false)
+    }
 
     // Function to get user initials for the avatar
     const getInitials = (name) => {
@@ -111,6 +127,30 @@ const ProfileScreen = () => {
                             <label className="profile-field__label" htmlFor={PROFILE_USER_FIELD_NAMES.EMAIL}>Correo electrónico</label>
                             <input type="email" className="profile-field__value profile-field__disabled" value={user.email} disabled />
                         </div>
+                        <div className="profile-feedback">
+                            {
+                                error && (
+                                    <div className="alert alert--error">
+                                        {error.message || 'Error al actualizar el perfil'}
+                                    </div>
+                                )
+                            }
+                            {
+                                response && !response.ok && (
+                                    <div className="alert alert--error">
+                                        {response.message || 'Error al actualizar el perfil'}
+                                    </div>
+                                )
+                            }
+                            {
+                                response && response.ok && (
+                                    <div className="alert alert--success">
+                                        {response.message || 'Perfil actualizado correctamente'}
+                                    </div>
+                                )
+                            }
+                        </div>
+
                         <div className="profile-actions">
                             {!isEditing ? (
                                 <>
@@ -126,27 +166,6 @@ const ProfileScreen = () => {
                                 </>
                             ) : (
                                 <>
-                                    {
-                                        error && (
-                                            <div className="alert alert--error">
-                                                {error.message || 'Error al actualizar el perfil'}
-                                            </div>
-                                        )
-                                    }
-                                    {
-                                        response && !response.ok && (
-                                            <div className="alert alert--error">
-                                                {response.message || 'Error al actualizar el perfil'}
-                                            </div>
-                                        )
-                                    }
-                                    {
-                                        response && response.ok && (
-                                            <div className="alert alert--success">
-                                                {response.message || 'Perfil actualizado correctamente'}
-                                            </div>
-                                        )
-                                    }
                                     <button type="button" className="btn btn--secondary profile-btn--cancel" onClick={onCancel}>
                                         <span>X</span> Cancelar
                                     </button>
@@ -158,6 +177,39 @@ const ProfileScreen = () => {
                         </div>
                     </form>
                 </div>
+
+                <div className="profile-card danger-zone">
+                    <div className="danger-zone__content">
+                        <div className="danger-zone__text">
+                            <h2 className="danger-zone__title">Zona de peligro</h2>
+                            <p className="danger-zone__description">
+                                Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, asegúrate.
+                            </p>
+                        </div>
+                        <button 
+                            type="button" 
+                            className="btn btn--danger-solid profile-btn--delete" 
+                            onClick={() => setIsDeleteModalOpen(true)}
+                        >
+                            <span>🗑️</span> Eliminar mi cuenta
+                        </button>
+                    </div>
+                </div>
+
+                <DeleteConfirmModal 
+                    isOpen={isDeleteModalOpen}
+                    onClose={() => setIsDeleteModalOpen(false)}
+                    onConfirm={handleDeleteAccount}
+                    title="¿Eliminar tu cuenta permanentemente?"
+                    message={
+                        <>
+                            <p>Estás a punto de eliminar tu cuenta de <strong>WorkChat</strong>.</p>
+                            <p>Si eres el único propietario de algún espacio de trabajo, este se eliminará. Si hay otros miembros, la propiedad se transferirá automáticamente.</p>
+                        </>
+                    }
+                    confirmText="Sí, eliminar cuenta"
+                    loading={loading}
+                />
             </main>
         </div>
     )

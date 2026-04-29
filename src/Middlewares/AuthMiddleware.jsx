@@ -18,7 +18,6 @@ const AuthMiddleware = () => {
                     }
                 } catch (error) {
                     console.error("Error al validar la sesión:", error)
-                    // No hacemos logout aquí por errores de red (ej: servidor caído)
                 }
             }
         }

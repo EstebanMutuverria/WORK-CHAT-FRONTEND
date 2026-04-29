@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router'
 import Modal from '../Modal/Modal'
 import './WorkspaceFormModal.css'
 import useRequest from '../../hooks/useRequest'
@@ -18,6 +19,7 @@ import { FaTrash, FaEdit, FaSave, FaTimes, FaCamera, FaPlus } from 'react-icons/
  * @param {function} onRefresh - Función para recargar la lista de espacios.
  */
 const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRefresh }) => {
+    const navigate = useNavigate()
     const [isEditing, setIsEditing] = useState(mode === 'edit' || mode === 'create')
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const hasRefreshed = useRef(false)
@@ -280,6 +282,10 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                             requestCb: () => deleteWorkspace({ workspace_id: workspace.workspace_id })
                         })
                         setShowDeleteConfirm(false)
+                        // Si estamos dentro de un workspace, redirigir al home al eliminarlo
+                        if (window.location.pathname.includes(`/workspaces/${workspace.workspace_id}`)) {
+                            navigate('/home')
+                        }
                         onClose()
                     }}
                     title="¿Eliminar espacio?"
