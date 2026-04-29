@@ -154,7 +154,7 @@ const HomeScreen = () => {
                                             </Link>
                                         </div>
                                         <button
-                                            className="workspace-card__delete"
+                                            className="settings-card-btn"
                                             onClick={(e) => handleOpenSettings(e, workspace)}
                                         >
                                             <HiDotsVertical />
