@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import useRequest from './useRequest'
 import { getMessages, deleteMessage } from '../service/message.service'
-import io from 'socket.io-client'
 import ENVIRONMENT from '../config/environment.config'
 
 /*
@@ -45,33 +44,6 @@ function useMessages({ workspace_id, channel_id }) {
             setMessages(fetchRequest.response.data.messages)
         }
     }, [fetchRequest.response])
-
-    // Configuración de Socket.io para tiempo real
-    useEffect(() => {
-        if (!channel_id) return
-
-        // Conectar al servidor de sockets
-        const socket = io(ENVIRONMENT.API_URL, {
-            transports: ['websocket']
-        })
-
-        // Unirse a la sala del canal actual
-        socket.emit('join_channel', channel_id)
-
-        // Escuchar nuevos mensajes
-        socket.on('new_message', (newMessage) => {
-            setMessages((prevMessages) => {
-                // Si el mensaje ya existe en el estado (por ejemplo, enviado por el mismo usuario), no duplicar
-                if (prevMessages.some(msg => msg._id === newMessage._id)) return prevMessages
-                return [...prevMessages, newMessage]
-            })
-        })
-
-        // Limpieza de la conexión al desmontar o cambiar de canal
-        return () => {
-            socket.disconnect()
-        }
-    }, [channel_id])
 
     // Llamado cuando el usuario presiona "Eliminar" en un MessageItem.
     const handleRequestDelete = (message_id) => {
