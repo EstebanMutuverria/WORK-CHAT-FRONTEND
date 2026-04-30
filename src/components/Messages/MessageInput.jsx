@@ -5,7 +5,7 @@ import useRequest from '../../hooks/useRequest';
 import { createMessage } from '../../service/message.service.js';
 import './Messages.css';
 
-const MessageInput = ({ workspace_id, channel_id }) => {
+const MessageInput = ({ workspace_id, channel_id, onMessageSent }) => {
     const FORM_FIELDS_NAME = {
         CONTENT: 'content'
     }
@@ -30,8 +30,9 @@ const MessageInput = ({ workspace_id, channel_id }) => {
     useEffect(() => {
         if (response && response.ok) {
             resetForm()
+            if (onMessageSent) onMessageSent()
         }
-    }, [response])
+    }, [response, onMessageSent])
 
     function onSubmitMessage(formState) {
         if (!formState[FORM_FIELDS_NAME.CONTENT].trim()) return;

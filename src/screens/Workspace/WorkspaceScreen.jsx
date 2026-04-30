@@ -264,14 +264,24 @@ const WorkspaceScreen = () => {
                         </svg>
                     </button>
                     {selectedChannel && (
-                        <h2 className="chat-header__title">
-                            <span>#</span> {selectedChannel.title}
+                        <div className="chat-header__info">
+                            <h2 className="chat-header__title">
+                                <span>#</span> {selectedChannel.title}
+                            </h2>
+                            <button 
+                                className="btn-refresh-chat" 
+                                onClick={fetchMessages} 
+                                title="Refrescar mensajes"
+                                disabled={messagesLoading}
+                            >
+                                <IoMdRefresh className={messagesLoading ? 'spinning' : ''} />
+                            </button>
                             {selectedChannel?.channel_description && (
                                 <span className="chat-header__subtitle">
                                     {selectedChannel.channel_description}
                                 </span>
                             )}
-                        </h2>
+                        </div>
                     )}
                     <Link className='btn btn--secondary header__back-btn' to={`/home`}>
                         <IoIosArrowBack />
@@ -318,6 +328,7 @@ const WorkspaceScreen = () => {
                         <MessageInput
                             workspace_id={workspace_id}
                             channel_id={selectedChannel._id}
+                            onMessageSent={fetchMessages}
                         />
                     </div>
                 )}
