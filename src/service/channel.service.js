@@ -45,3 +45,15 @@ export async function updateChannel({ workspace_id, channel_id, title, descripti
     if (!response.ok) throw response
     return response
 }
+
+export async function deleteChannel(workspace_id, channel_id) {
+    const response_http = await authenticatedFetch(
+        ENVIRONMENT.API_URL + `/api/workspaces/${workspace_id}/channels/${channel_id}`,
+        {
+            method: 'DELETE'
+        }
+    )
+    const response = await response_http.json()
+    if (!response.ok) throw response
+    return response
+}

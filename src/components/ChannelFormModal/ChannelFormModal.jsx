@@ -2,10 +2,13 @@ import React, { useState, useEffect, useRef } from 'react'
 import Modal from '../Modal/Modal'
 import useRequest from '../../hooks/useRequest'
 import useForm from '../../hooks/useForm'
-import { createChannel, updateChannel } from '../../service/channel.service'
-import { FaPlus, FaSave, FaTimes } from 'react-icons/fa'
+import { createChannel, updateChannel, deleteChannel } from '../../service/channel.service'
+import { FaPlus, FaSave, FaTimes, FaTrash, FaEdit } from 'react-icons/fa'
+import DeleteConfirmModal from '../DeleteConfirmModal/DeleteConfirmModal'
 
-const ChannelFormModal = ({ workspaceId, channel, mode = 'create', isOpen, onClose, onRefresh }) => {
+const ChannelFormModal = ({ workspaceId, workspaceRole, channel, mode = 'create', isOpen, onClose, onRefresh }) => {
+    const [isEditing, setIsEditing] = useState(mode === 'edit' || mode === 'create')
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const hasRefreshed = useRef(false)
 
     const CHANNEL_FORM_FIELDS = {
@@ -57,15 +60,30 @@ const ChannelFormModal = ({ workspaceId, channel, mode = 'create', isOpen, onClo
         })
     }
 
+    const handleEditToggle = (e) => {
+        if (e && e.preventDefault) e.preventDefault()
+        resetRequest()
+        if (isEditing && mode !== 'create') {
+            // Cancelar edición: resetear valores
+            setFields({
+                [CHANNEL_FORM_FIELDS.TITLE]: channel.title || '',
+                [CHANNEL_FORM_FIELDS.DESCRIPTION]: channel.description || ''
+            })
+        }
+        setIsEditing(!isEditing)
+    }
+
     useEffect(() => {
         if (isOpen) {
-            if (channel && mode === 'edit') {
+            if (channel && mode !== 'create') {
                 setFields({
                     [CHANNEL_FORM_FIELDS.TITLE]: channel.title || '',
                     [CHANNEL_FORM_FIELDS.DESCRIPTION]: channel.description || ''
                 })
+                setIsEditing(mode === 'edit')
             } else {
                 resetForm()
+                setIsEditing(true)
             }
             hasRefreshed.current = false
             resetRequest()
@@ -88,66 +106,112 @@ const ChannelFormModal = ({ workspaceId, channel, mode = 'create', isOpen, onClo
     }, [response, onRefresh, onClose])
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={() => !loading && onClose()}
-            title={mode === 'create' ? 'Crear nuevo canal' : 'Editar canal'}
-        >
-            <form className="form" onSubmit={onSubmit}>
-                <div className="form-group">
-                    <label className="form-label" htmlFor={CHANNEL_FORM_FIELDS.TITLE}>Nombre del Canal</label>
-                    <input
-                        className="form-input"
-                        type="text"
-                        id={CHANNEL_FORM_FIELDS.TITLE}
-                        name={CHANNEL_FORM_FIELDS.TITLE}
-                        value={formState[CHANNEL_FORM_FIELDS.TITLE]}
-                        onChange={handleChangeInput}
-                        placeholder="Ej: # anuncios"
-                        required
-                        disabled={loading}
+        <>
+            <Modal
+                isOpen={isOpen}
+                onClose={() => !loading && onClose()}
+                title={mode === 'create' ? 'Crear nuevo canal' : mode === 'edit' ? 'Editar canal' : 'Detalles del Canal'}
+            >
+                <form className="form" onSubmit={onSubmit}>
+                    <div className="form-group">
+                        <label className="form-label" htmlFor={CHANNEL_FORM_FIELDS.TITLE}>Nombre del Canal</label>
+                        <input
+                            className="form-input"
+                            type="text"
+                            id={CHANNEL_FORM_FIELDS.TITLE}
+                            name={CHANNEL_FORM_FIELDS.TITLE}
+                            value={formState[CHANNEL_FORM_FIELDS.TITLE]}
+                            onChange={handleChangeInput}
+                            placeholder="Ej: # anuncios"
+                            required
+                            disabled={loading || (!isEditing && mode !== 'create')}
+                            readOnly={!isEditing && mode !== 'create'}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label" htmlFor={CHANNEL_FORM_FIELDS.DESCRIPTION}>Descripción</label>
+                        <input
+                            className="form-input"
+                            type="text"
+                            id={CHANNEL_FORM_FIELDS.DESCRIPTION}
+                            name={CHANNEL_FORM_FIELDS.DESCRIPTION}
+                            value={formState[CHANNEL_FORM_FIELDS.DESCRIPTION]}
+                            onChange={handleChangeInput}
+                            placeholder="¿De qué trata este canal?"
+                            disabled={loading || (!isEditing && mode !== 'create')}
+                            readOnly={!isEditing && mode !== 'create'}
+                        />
+                    </div>
+
+                    {error && <div className="alert alert--error">{error.message || 'Error en la operación'}</div>}
+                    {response && response.ok && (
+                        <div className="alert alert--success">
+                            {mode === 'create' ? 'Canal creado con éxito.' : response.message?.includes('eliminado') ? 'Canal eliminado con éxito.' : 'Canal actualizado con éxito.'}
+                        </div>
+                    )}
+
+                    <div className="ws-form__actions" style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                        {!isEditing ? (
+                            <>
+                                {(workspaceRole === 'owner' || workspaceRole === 'admin') && (
+                                    <>
+                                        <button type="button" className="btn btn--secondary" onClick={handleEditToggle}>
+                                            <FaEdit /> Editar
+                                        </button>
+
+                                        {workspaceRole === 'owner' && (
+                                            <button type="button" className="btn btn--danger" onClick={() => setShowDeleteConfirm(true)}>
+                                                <FaTrash /> Eliminar
+                                            </button>
+                                        )}
+                                    </>
+                                )}
+                                {(workspaceRole === 'user') && (
+                                    <button type="button" className="btn btn--secondary" onClick={onClose}>
+                                        <FaTimes /> Cerrar
+                                    </button>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                {mode !== 'create' && (
+                                    <button type="button" className="btn btn--secondary" onClick={handleEditToggle} disabled={loading}>
+                                        <FaTimes /> Cancelar
+                                    </button>
+                                )}
+                                <button type="submit" className="btn btn--primary" disabled={loading}>
+                                    {mode === 'create' ? <FaPlus /> : <FaSave />}
+                                    {loading ? 'Procesando...' : (mode === 'create' ? 'Crear Canal' : 'Guardar Cambios')}
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </form>
+            </Modal>
+
+            {
+                mode !== 'create' && channel && (
+                    <DeleteConfirmModal
+                        isOpen={showDeleteConfirm}
+                        onClose={() => setShowDeleteConfirm(false)}
+                        onConfirm={async () => {
+                            await sendRequest({
+                                requestCb: () => deleteChannel(workspaceId, channel._id)
+                            })
+                            setShowDeleteConfirm(false)
+                        }}
+                        title="¿Eliminar canal?"
+                        message={
+                            <p>¿Seguro que quieres eliminar el canal <strong>#{channel.title}</strong>? Esta acción es irreversible.</p>
+                        }
+                        loading={loading}
                     />
-                </div>
-
-                <div className="form-group">
-                    <label className="form-label" htmlFor={CHANNEL_FORM_FIELDS.DESCRIPTION}>Descripción</label>
-                    <input
-                        className="form-input"
-                        type="text"
-                        id={CHANNEL_FORM_FIELDS.DESCRIPTION}
-                        name={CHANNEL_FORM_FIELDS.DESCRIPTION}
-                        value={formState[CHANNEL_FORM_FIELDS.DESCRIPTION]}
-                        onChange={handleChangeInput}
-                        placeholder="¿De qué trata este canal?"
-                        disabled={loading}
-                    />
-                </div>
-
-                {error && <div className="alert alert--error">{error.message || 'Error en la operación'}</div>}
-                {response && response.ok && <div className="alert alert--success">Canal {mode === 'create' ? 'creado' : 'actualizado'} con éxito.</div>}
-
-                <div className="modal-actions" style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                    <button
-                        className="btn btn--primary"
-                        type="submit"
-                        disabled={loading}
-                        style={{ flex: 1 }}
-                    >
-                        {mode === 'create' ? <FaPlus /> : <FaSave />}
-                        {loading ? 'Procesando...' : (mode === 'create' ? 'Crear Canal' : 'Guardar Cambios')}
-                    </button>
-                    <button
-                        className="btn btn--secondary"
-                        type="button"
-                        onClick={onClose}
-                        disabled={loading}
-                    >
-                        <FaTimes /> Cancelar
-                    </button>
-                </div>
-            </form>
-        </Modal>
+                )
+            }
+        </>
     )
 }
 
 export default ChannelFormModal
+

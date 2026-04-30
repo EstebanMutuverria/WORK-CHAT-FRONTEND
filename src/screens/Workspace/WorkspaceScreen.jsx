@@ -111,7 +111,7 @@ const WorkspaceScreen = () => {
     const handleOpenEditChannel = (e, channel) => {
         e?.preventDefault()
         e?.stopPropagation()
-        setChannelModalMode('edit')
+        setChannelModalMode('view')
         setSelectedChannelForEdit(channel)
         setIsChannelModalOpen(true)
     }
@@ -328,6 +328,7 @@ const WorkspaceScreen = () => {
                 mode={channelModalMode}
                 channel={selectedChannelForEdit}
                 workspaceId={workspace_id}
+                workspaceRole={workspace?.workspace_role}
                 onClose={() => setIsChannelModalOpen(false)}
                 onRefresh={handleRefresh}
             />
