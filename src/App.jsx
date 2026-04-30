@@ -7,6 +7,18 @@ import AuthMiddleware from "./Middlewares/AuthMiddleware"
 import WorkspaceScreen from "./screens/Workspace/WorkspaceScreen"
 import ProfileScreen from "./screens/ProfileScreen/ProfileScreen"
 
+/**
+ * @fileoverview Componente principal de la aplicación que define el enrutamiento.
+ */
+
+/**
+ * Componente raíz App.
+ * Configura las rutas principales de la aplicación utilizando React Router.
+ * Maneja las rutas públicas (Login, Register, etc.) y las rutas privadas
+ * que están protegidas por el AuthMiddleware.
+ * 
+ * @returns {JSX.Element} El componente de enrutamiento principal.
+ */
 function App() {
 
   return (

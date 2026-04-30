@@ -1,6 +1,14 @@
+/**
+ * @fileoverview Proveedor de contexto global de Autenticación.
+ */
+
 import { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 
+/**
+ * @type {React.Context}
+ * @description Contexto para la autenticación de usuarios.
+ */
 export const AuthContext = createContext(
     {
         isLoggoed: false,
@@ -13,9 +21,17 @@ export const AuthContext = createContext(
     }
 )
 
+/**
+ * Clave utilizada para guardar el token en localStorage.
+ * @type {string}
+ */
 export const LOCALSTORAGE_TOKEN_KEY = 'slack_auth_token'
 
-// Función auxiliar para decodificar un token JWT usando JS Nativo
+/**
+ * Función auxiliar para decodificar un token JWT usando JS Nativo.
+ * @param {string} token - Token JWT a decodificar.
+ * @returns {Object|null} Payload decodificado o null en caso de error.
+ */
 function decodeToken(token) {
     try {
         const payload = token.split('.')[1] //Obtiene la segunda parte del token (payload)
@@ -25,14 +41,14 @@ function decodeToken(token) {
         return null
     }
 }
-/*
-AuthContext: Va a manejar el estado de sesión del usuario en un contexto global
-
-Es global ya que quiero saber desde todas las pantallas de la web si el usuario esta o no logueado
-
-ABSOLUTAMENTE TODOS LOS COMPONENTES DE LA APP VAN A TENER ACCESO A ESTE CONTEXTO
-*/
-
+/**
+ * AuthContextProvider: Maneja el estado de sesión del usuario en un contexto global.
+ * Es global para conocer si el usuario está logueado desde todas las pantallas.
+ * 
+ * @param {Object} props - Propiedades del componente.
+ * @param {React.ReactNode} props.children - Componentes hijos envueltos.
+ * @returns {JSX.Element} Proveedor del contexto de autenticación.
+ */
 function AuthContextProvider({ children }) {
 
     function getInitialUser() {

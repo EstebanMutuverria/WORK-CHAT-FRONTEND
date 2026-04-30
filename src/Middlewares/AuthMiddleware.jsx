@@ -3,6 +3,14 @@ import { AuthContext, LOCALSTORAGE_TOKEN_KEY } from '../context/AuthContext'
 import { Navigate, Outlet } from 'react-router'
 import { verifyToken } from '../service/auth.service'
 
+/**
+ * Middleware de Autenticación.
+ * Componente que intercepta las rutas protegidas y verifica la validez del token
+ * del usuario contra el backend de manera asíncrona. Si el usuario no está logueado
+ * es redirigido a '/login'.
+ * 
+ * @returns {JSX.Element} Componente de ruta Outlet si está autenticado, caso contrario Navigate a '/login'.
+ */
 const AuthMiddleware = () => {
     const { isLogged, logout } = useContext(AuthContext)
 
