@@ -14,7 +14,7 @@ const ProfileScreen = () => {
         NAME: 'name',
         EMAIL: 'email',
     }
-    const { user, logout, updateUserContext } = useContext(AuthContext)
+    const { user, logout, updateUserContext, updateToken } = useContext(AuthContext)
 
     const [isEditing, setIsEditing] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -63,7 +63,7 @@ const ProfileScreen = () => {
                     user.id
                 );
                 if (response.status === 200) {
-                    updateUserContext({ name: response.data.user_name })
+                    updateToken(response.data.auth_token)
                 }
                 return response
             }

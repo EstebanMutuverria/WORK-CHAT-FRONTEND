@@ -5,7 +5,7 @@ import useRequest from '../../hooks/useRequest';
 import { createMessage } from '../../service/message.service.js';
 import './Messages.css';
 
-const MessageInput = ({ workspace_id, channel_id, onMessageSent }) => {
+const MessageInput = ({ workspace_id, channel_id }) => {
     const FORM_FIELDS_NAME = {
         CONTENT: 'content'
     }
@@ -30,13 +30,12 @@ const MessageInput = ({ workspace_id, channel_id, onMessageSent }) => {
     useEffect(() => {
         if (response && response.ok) {
             resetForm()
-            onMessageSent()
         }
     }, [response])
 
     function onSubmitMessage(formState) {
         if (!formState[FORM_FIELDS_NAME.CONTENT].trim()) return;
-        
+
         sendRequest({
             requestCb: async () => {
                 return await createMessage(workspace_id, channel_id, formState[FORM_FIELDS_NAME.CONTENT])
@@ -83,4 +82,4 @@ const MessageInput = ({ workspace_id, channel_id, onMessageSent }) => {
     );
 };
 
-export default MessageInput;
+export default MessageInput;

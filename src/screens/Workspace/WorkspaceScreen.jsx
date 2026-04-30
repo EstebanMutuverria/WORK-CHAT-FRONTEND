@@ -318,7 +318,6 @@ const WorkspaceScreen = () => {
                         <MessageInput
                             workspace_id={workspace_id}
                             channel_id={selectedChannel._id}
-                            onMessageSent={fetchMessages}
                         />
                     </div>
                 )}

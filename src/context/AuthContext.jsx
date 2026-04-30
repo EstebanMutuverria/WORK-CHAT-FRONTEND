@@ -100,6 +100,12 @@ function AuthContextProvider({ children }) {
         setUser({ ...user, ...new_data })
     }
 
+    function updateToken(auth_token) {
+        localStorage.setItem(LOCALSTORAGE_TOKEN_KEY, auth_token)
+        const decodeUser = decodeToken(auth_token)
+        setUser(decodeUser)
+    }
+
 
     const providerValues = {
         isLogged,
@@ -109,7 +115,8 @@ function AuthContextProvider({ children }) {
         setShowIntro,
         manageLogin,
         logout,
-        updateUserContext
+        updateUserContext,
+        updateToken
     }
     return (
         <AuthContext.Provider value={providerValues}>
