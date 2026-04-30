@@ -12,7 +12,7 @@ import MessageList from '../../components/Messages/MessageList.jsx'
 import MessageInput from '../../components/Messages/MessageInput.jsx'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal/DeleteConfirmModal'
 import useMessages from '../../hooks/useMessages'
-import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowBack, IoMdRefresh } from "react-icons/io";
 
 const WorkspaceScreen = () => {
     const { workspace_id, channel_id } = useParams()
@@ -268,9 +268,9 @@ const WorkspaceScreen = () => {
                             <h2 className="chat-header__title">
                                 <span>#</span> {selectedChannel.title}
                             </h2>
-                            <button 
-                                className="btn-refresh-chat" 
-                                onClick={fetchMessages} 
+                            <button
+                                className="btn-refresh-chat"
+                                onClick={fetchMessages}
                                 title="Refrescar mensajes"
                                 disabled={messagesLoading}
                             >
