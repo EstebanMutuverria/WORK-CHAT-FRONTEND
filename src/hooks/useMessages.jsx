@@ -51,7 +51,9 @@ function useMessages({ workspace_id, channel_id }) {
         if (!channel_id) return
 
         // Conectar al servidor de sockets
-        const socket = io(ENVIRONMENT.API_URL)
+        const socket = io(ENVIRONMENT.API_URL, {
+            transports: ['websocket']
+        })
 
         // Unirse a la sala del canal actual
         socket.emit('join_channel', channel_id)
