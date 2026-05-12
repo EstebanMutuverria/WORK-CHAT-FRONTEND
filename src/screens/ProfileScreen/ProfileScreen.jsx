@@ -6,6 +6,11 @@ import useForm from '../../hooks/useForm'
 import useRequest from '../../hooks/useRequest'
 import { updateUser, deleteUser } from '../../service/user.service.js'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal/DeleteConfirmModal'
+import { FaGithub } from "react-icons/fa";
+import { CiLinkedin } from "react-icons/ci";
+import { FaXTwitter } from "react-icons/fa6";
+import { FaInstagram } from "react-icons/fa";
+import { FaWhatsapp } from "react-icons/fa";
 
 
 const ProfileScreen = () => {
@@ -13,6 +18,10 @@ const ProfileScreen = () => {
     const PROFILE_USER_FIELD_NAMES = {
         NAME: 'name',
         EMAIL: 'email',
+        GITHUB: 'github',
+        LINKEDIN: 'linkedin',
+        TWITTER: 'twitter',
+        INSTAGRAM: 'instagram'
     }
     const { user, logout, updateUserContext, updateToken } = useContext(AuthContext)
 
@@ -44,7 +53,11 @@ const ProfileScreen = () => {
 
     const initialFormState = {
         [PROFILE_USER_FIELD_NAMES.NAME]: user.name,
-        [PROFILE_USER_FIELD_NAMES.EMAIL]: user.email
+        [PROFILE_USER_FIELD_NAMES.EMAIL]: user.email,
+        [PROFILE_USER_FIELD_NAMES.GITHUB]: user.github || '',
+        [PROFILE_USER_FIELD_NAMES.LINKEDIN]: user.linkedin || '',
+        [PROFILE_USER_FIELD_NAMES.TWITTER]: user.twitter || '',
+        [PROFILE_USER_FIELD_NAMES.INSTAGRAM]: user.instagram || ''
     }
 
     const {
@@ -58,10 +71,7 @@ const ProfileScreen = () => {
     async function onSaveProfile(formState) {
         await sendRequest({
             requestCb: async () => {
-                const response = await updateUser(
-                    formState[PROFILE_USER_FIELD_NAMES.NAME],
-                    user.id
-                );
+                const response = await updateUser(formState, user.id);
                 if (response.status === 200) {
                     updateToken(response.data.auth_token)
                 }
@@ -70,7 +80,7 @@ const ProfileScreen = () => {
         })
         setIsEditing(false)
     }
-    
+
     async function handleDeleteAccount() {
         await sendRequest({
             requestCb: async () => {
@@ -94,6 +104,37 @@ const ProfileScreen = () => {
             .slice(0, 2)
             .toUpperCase()
     }
+
+    const SOCIAL_FIELD_CONFIG = [
+        {
+            id: 1,
+            name: PROFILE_USER_FIELD_NAMES.GITHUB,
+            label: 'Github',
+            type: 'url',
+            icon: <FaGithub />
+        },
+        {
+            id: 2,
+            name: PROFILE_USER_FIELD_NAMES.LINKEDIN,
+            label: 'Linkedin',
+            type: 'url',
+            icon: <CiLinkedin />
+        },
+        {
+            id: 3,
+            name: PROFILE_USER_FIELD_NAMES.TWITTER,
+            label: 'Twitter',
+            type: 'url',
+            icon: <FaXTwitter />
+        },
+        {
+            id: 4,
+            name: PROFILE_USER_FIELD_NAMES.INSTAGRAM,
+            label: 'Instagram',
+            type: 'url',
+            icon: <FaInstagram />
+        }
+    ]
 
     return (
         <div className="profile-page">
@@ -127,6 +168,27 @@ const ProfileScreen = () => {
                             <label className="profile-field__label" htmlFor={PROFILE_USER_FIELD_NAMES.EMAIL}>Correo electrónico</label>
                             <input type="email" className="profile-field__value profile-field__disabled" value={user.email} disabled />
                         </div>
+                        {
+                            SOCIAL_FIELD_CONFIG.map((field) => (
+                                <div className="profile-field" key={field.id}>
+                                    <label className="profile-field__label" htmlFor={field.name}>{field.label}</label>
+                                    <div className={`profile-field__social-input ${!isEditing ? 'profile-field__social-input--disabled' : ''}`}>
+                                        <span className={`profile-field__social-icon ${!isEditing ? 'profile-field__social-icon--disabled' : ''}`}>{field.icon}</span>
+                                        {
+                                            isEditing ? (
+                                                <input type="url" className={`profile-field__value ${!isEditing ? 'profile-field__disabled' : ''}`} value={formState[field.name]} onChange={handleChangeInput} name={field.name} disabled={!isEditing} />
+                                            ) : (
+                                                formState[field.name] ? (
+                                                    <a href={formState[field.name] || '#'} target="_blank" rel="noopener noreferrer" className={`profile-field__value ${!isEditing ? 'profile-field__disabled' : ''}`} value={formState[field.name]} onChange={handleChangeInput} name={field.name} disabled={!isEditing}>{formState[field.name]}</a>
+                                                ) : (
+                                                    <span className={`profile-field__value ${!isEditing ? 'profile-field__disabled' : ''}`}>Sin configurar</span>
+                                                )
+                                            )
+                                        }
+                                    </div>
+                                </div>
+                            ))
+                        }
                         <div className="profile-feedback">
                             {
                                 error && (
@@ -186,9 +248,9 @@ const ProfileScreen = () => {
                                 Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, asegúrate.
                             </p>
                         </div>
-                        <button 
-                            type="button" 
-                            className="btn btn--danger-solid profile-btn--delete" 
+                        <button
+                            type="button"
+                            className="btn btn--danger-solid profile-btn--delete"
                             onClick={() => setIsDeleteModalOpen(true)}
                         >
                             <span>🗑️</span> Eliminar mi cuenta
@@ -196,7 +258,7 @@ const ProfileScreen = () => {
                     </div>
                 </div>
 
-                <DeleteConfirmModal 
+                <DeleteConfirmModal
                     isOpen={isDeleteModalOpen}
                     onClose={() => setIsDeleteModalOpen(false)}
                     onConfirm={handleDeleteAccount}

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { HiOutlineTrash } from 'react-icons/hi2';
 import './Messages.css';
 import { AuthContext } from '../../context/AuthContext';
+import ENVIRONMENT from '../../config/environment.config';
 
 const MessageItem = ({ message, onDelete }) => {
     const { user } = useContext(AuthContext)
@@ -27,6 +28,11 @@ const MessageItem = ({ message, onDelete }) => {
                 <div className="message-text">
                     {message.content}
                 </div>
+                {message.attachment && (
+                    <div className="message-attachment">
+                        <img src={message.attachment} alt="Attachment" className="message-image" />
+                    </div>
+                )}
             </div>
 
             <div className="message-actions">
