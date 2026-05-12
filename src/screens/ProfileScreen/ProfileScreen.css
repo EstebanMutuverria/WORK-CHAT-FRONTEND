@@ -272,7 +272,7 @@
 }
 
 a.profile-field__value {
-  color: var(--color-brand-primary) !important;
+  color: rgba(76, 139, 223, 0.863);
   font-weight: 600;
   text-decoration: none;
   transition: all var(--transition-fast);
