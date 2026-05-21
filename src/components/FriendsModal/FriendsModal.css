@@ -1,0 +1,314 @@
+/* Contenedor principal del modal de amigos */
+.friends-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    color: var(--color-text-primary, #f5f5f5);
+    min-height: 380px;
+}
+
+/* Barra de Pestañas (Tabs) */
+.friends-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.friends-tab-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary, #9e9e9e);
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.friends-tab-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.friends-tab-btn.active {
+    color: #00b0ff; /* Color celeste brillante moderno */
+    background: rgba(0, 176, 255, 0.1);
+}
+
+.friends-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -9px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #00b0ff;
+    border-radius: 3px 3px 0 0;
+}
+
+/* Badge de Solicitudes Pendientes (Notificación Roja flotante) */
+.pending-badge {
+    background: #ff1744; /* Rojo vibrante */
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 10px;
+    line-height: 1;
+    display: inline-block;
+    animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); box-shadow: 0 0 8px rgba(255, 23, 68, 0.6); }
+    100% { transform: scale(1); }
+}
+
+/* Contenido de las pestañas */
+.friends-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Spinner de carga */
+.friends-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 3rem 0;
+    color: var(--color-text-secondary);
+}
+
+/* Estados Vacíos (Empty States) */
+.friends-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--color-text-secondary, #9e9e9e);
+    gap: 1rem;
+}
+
+.friends-empty-icon {
+    font-size: 3rem;
+    opacity: 0.4;
+    color: #00b0ff;
+}
+
+/* Lista Scrollable */
+.friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 0.3rem;
+}
+
+.friends-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.friends-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+/* Tarjeta individual (Amigo o Solicitud) */
+.friends-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    transition: all 0.25s ease;
+}
+
+.friends-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.friends-card__info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Avatar de Iniciales */
+.friends-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00b0ff, #00e5ff);
+    color: #121212;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(0, 176, 255, 0.2);
+}
+
+.friends-avatar.pending {
+    background: linear-gradient(135deg, #ff9100, #ffea00);
+}
+
+.friends-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.friends-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+}
+
+.friends-email {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary, #9e9e9e);
+}
+
+/* Acciones y Botones */
+.friends-actions {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.friends-btn {
+    border: none;
+    background: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.friends-btn--delete {
+    color: #ff5252;
+    background: rgba(255, 82, 82, 0.1);
+}
+
+.friends-btn--delete:hover {
+    color: white;
+    background: #ff5252;
+    box-shadow: 0 0 10px rgba(255, 82, 82, 0.4);
+    transform: scale(1.05);
+}
+
+.friends-btn--accept {
+    color: #00e676;
+    background: rgba(0, 230, 118, 0.1);
+}
+
+.friends-btn--accept:hover {
+    color: white;
+    background: #00e676;
+    box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
+    transform: scale(1.05);
+}
+
+.friends-btn--reject {
+    color: #ff9100;
+    background: rgba(255, 145, 0, 0.1);
+}
+
+.friends-btn--reject:hover {
+    color: white;
+    background: #ff9100;
+    box-shadow: 0 0 10px rgba(255, 145, 0, 0.4);
+    transform: scale(1.05);
+}
+
+/* Formulario agregar amigo */
+.friends-add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1.5rem 0;
+}
+
+.friends-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.friends-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.friends-input-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--color-text-secondary);
+    opacity: 0.7;
+}
+
+.friends-input {
+    width: 100%;
+    padding: 0.9rem 1rem 0.9rem 2.8rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.friends-input:focus {
+    outline: none;
+    border-color: #00b0ff;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 12px rgba(0, 176, 255, 0.2);
+}
+
+/* Alertas de éxito y error */
+.alert {
+    padding: 0.9rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 550;
+    animation: fadeIn 0.3s ease;
+}
+
+.alert--error {
+    background: rgba(255, 82, 82, 0.12);
+    border: 1px solid rgba(255, 82, 82, 0.2);
+    color: #ff5252;
+}
+
+.alert--success {
+    background: rgba(0, 230, 118, 0.12);
+    border: 1px solid rgba(0, 230, 118, 0.2);
+    color: #00e676;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

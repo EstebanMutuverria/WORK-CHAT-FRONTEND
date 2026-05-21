@@ -111,6 +111,31 @@
   filter: none;
 }
 
+/* Botón de Amigos con Badge */
+.home-nav__btn--friends {
+  position: relative;
+}
+
+.home-nav__badge {
+  background: #ff1744;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  line-height: 1.2;
+  min-width: 18px;
+  text-align: center;
+  animation: pulse-nav-badge 2s infinite;
+  box-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
+}
+
+@keyframes pulse-nav-badge {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); box-shadow: 0 0 12px rgba(255, 23, 68, 0.6); }
+  100% { transform: scale(1); }
+}
+
 /* Mobile Toggle Hamburger */
 .home-nav__mobile-toggle {
   display: none;

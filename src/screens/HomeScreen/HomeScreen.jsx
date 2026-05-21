@@ -5,10 +5,12 @@ import ENVIRONMENT from '../../config/environment.config.js'
 import './HomeScreen.css'
 import { AuthContext } from '../../context/AuthContext.jsx'
 import WelcomeIntro from '../../components/WelcomeIntro/WelcomeIntro.jsx'
-import { FaBuilding, FaUser } from "react-icons/fa";
+import { FaBuilding, FaUser, FaUsers } from "react-icons/fa";
 import { FaSignOutAlt } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
 import WorkspaceFormModal from '../../components/WorkspaceFormModal/WorkspaceFormModal.jsx'
+import FriendsModal from '../../components/FriendsModal/FriendsModal.jsx'
+import { getPendingRequests } from '../../service/friendship.service.js'
 
 
 const HomeScreen = () => {
@@ -30,6 +32,25 @@ const HomeScreen = () => {
     const [selectedWorkspace, setSelectedWorkspace] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [modalMode, setModalMode] = useState('create')
+    const [isFriendsModalOpen, setIsFriendsModalOpen] = useState(false)
+    const [pendingCount, setPendingCount] = useState(0)
+
+    // Obtener la cantidad de solicitudes pendientes para el badge del navbar
+    const fetchPendingCount = async () => {
+        try {
+            const res = await getPendingRequests()
+            if (res.ok) {
+                setPendingCount(res.data.length)
+            }
+        } catch (err) {
+            // Si falla, simplemente no mostramos badge
+            setPendingCount(0)
+        }
+    }
+
+    useEffect(() => {
+        fetchPendingCount()
+    }, [])
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
@@ -75,6 +96,18 @@ const HomeScreen = () => {
                                 <span className="home-nav__icon"><FaUser /></span>
                                 Perfil
                             </Link>
+                        </li>
+                        <li className="home-nav__item">
+                            <button 
+                                onClick={() => { setIsFriendsModalOpen(true); setIsMenuOpen(false); }} 
+                                className="home-nav__btn home-nav__btn--friends"
+                            >
+                                <span className="home-nav__icon"><FaUsers /></span>
+                                Amigos
+                                {pendingCount > 0 && (
+                                    <span className="home-nav__badge">{pendingCount}</span>
+                                )}
+                            </button>
                         </li>
                         <li className="home-nav__item">
                             <button onClick={() => { logout(); setIsMenuOpen(false); }} className="home-nav__btn">
@@ -184,6 +217,14 @@ const HomeScreen = () => {
                     setSelectedWorkspace(null)
                 }}
                 onRefresh={refetch}
+            />
+
+            <FriendsModal
+                isOpen={isFriendsModalOpen}
+                onClose={() => {
+                    setIsFriendsModalOpen(false)
+                    fetchPendingCount() // Refrescamos el badge al cerrar el modal
+                }}
             />
 
         </div>
