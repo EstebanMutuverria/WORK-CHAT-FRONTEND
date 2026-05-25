@@ -4,6 +4,8 @@ import DeleteConfirmModal from '../DeleteConfirmModal/DeleteConfirmModal'
 import useFriends from '../../hooks/useFriends'
 import { AuthContext } from '../../context/AuthContext'
 import { FaUsers, FaUserClock, FaUserPlus, FaTrash, FaCheck, FaTimes, FaEnvelope, FaInfoCircle } from 'react-icons/fa'
+import { BiMailSend } from "react-icons/bi";
+import { MdCancel } from "react-icons/md";
 import './FriendsModal.css'
 
 /**
@@ -16,7 +18,7 @@ import './FriendsModal.css'
  */
 const FriendsModal = ({ isOpen, onClose }) => {
     // 1. Estados Locales del Modal
-    const [activeTab, setActiveTab] = useState('friends') // Controla la pestaña activa ('friends', 'pending', 'add')
+    const [activeTab, setActiveTab] = useState('friends') // Controla la pestaña activa ('friends', 'pending', 'add', 'sent')
     const [emailInput, setEmailInput] = useState('') // Guarda el correo escrito en la pestaña "Agregar amigo"
 
     // Estados específicos para controlar el modal de confirmación de eliminación
@@ -32,15 +34,19 @@ const FriendsModal = ({ isOpen, onClose }) => {
         pendingRequest,
         loading,
         error,
-        succes, // Nota: Se conserva el nombre de la variable 'succes' (con una sola 's' al final) para coincidir con el hook
+        response,
+        succes,
         fetchFriends,
         fetchPendingRequests,
         sendFriendship,
         acceptRequest,
-        rejectRequest,
         removeFriend,
         clearMessages
     } = useFriends()
+
+    // Filtrar solicitudes recibidas y enviadas
+    const receivedRequests = pendingRequest.filter(req => req.recipient && req.recipient._id === user?.id)
+    const sentRequests = pendingRequest.filter(req => req.requester && req.requester._id === user?.id)
 
     // 3. Efecto de carga inicial
     // Cada vez que se abre el modal (isOpen cambia a true), queremos asegurarnos de:
@@ -146,9 +152,19 @@ const FriendsModal = ({ isOpen, onClose }) => {
                             onClick={() => { setActiveTab('pending'); clearMessages(); }}
                         >
                             <FaUserClock /> Solicitudes
-                            {/* Mostramos el globo rojo de notificaciones sólo si hay solicitudes pendientes */}
-                            {pendingRequest.length > 0 && (
-                                <span className="pending-badge">{pendingRequest.length}</span>
+                            {/* Mostramos el globo rojo de notificaciones sólo si hay solicitudes pendientes recibidas */}
+                            {receivedRequests.length > 0 && (
+                                <span className="pending-badge">{receivedRequests.length}</span>
+                            )}
+                        </button>
+
+                        <button
+                            className={`friends-tab-btn ${activeTab === 'sent' ? 'active' : ''}`}
+                            onClick={() => { setActiveTab('sent'); clearMessages(); }}
+                        >
+                            <BiMailSend /> Enviadas
+                            {sentRequests.length > 0 && (
+                                <span className="pending-badge">{sentRequests.length}</span>
                             )}
                         </button>
 
@@ -162,7 +178,11 @@ const FriendsModal = ({ isOpen, onClose }) => {
 
                     {/* 7. Mensajes de Éxito o Error de los servicios */}
                     {succes && <div className="alert alert--success">{succes}</div>}
-                    {error && <div className="alert alert--error">{error.message}</div>}
+                    {error && (
+                        <div className="alert alert--error">
+                            {error.message || (typeof error === 'string' ? error : 'Ocurrió un error inesperado')}
+                        </div>
+                    )}
 
                     {/* 8. Contenido Dinámico de las Pestañas */}
                     <div className="friends-content">
@@ -222,15 +242,14 @@ const FriendsModal = ({ isOpen, onClose }) => {
                         {/* PESTAÑA 2: Solicitudes Pendientes Recibidas */}
                         {!loading && activeTab === 'pending' && (
                             <>
-                                {pendingRequest.length === 0 ? (
+                                {receivedRequests.length === 0 ? (
                                     <div className="friends-empty-state">
                                         <FaInfoCircle className="friends-empty-icon" />
                                         <p>No tienes solicitudes de amistad pendientes.</p>
                                     </div>
                                 ) : (
                                     <div className="friends-list">
-                                        {pendingRequest.map((request) => {
-                                            // En las solicitudes de getPendingRequests del backend, el emisor siempre es 'requester'
+                                        {receivedRequests.map((request) => {
                                             const senderInfo = request.requester
                                             if (!senderInfo) return null
 
@@ -238,7 +257,6 @@ const FriendsModal = ({ isOpen, onClose }) => {
                                             return (
                                                 <div className="friends-card" key={request._id}>
                                                     <div className="friends-card__info">
-                                                        {/* Avatar amarillo de color pendiente */}
                                                         <div className="friends-avatar pending">
                                                             {getInitials(displayName)}
                                                         </div>
@@ -258,7 +276,7 @@ const FriendsModal = ({ isOpen, onClose }) => {
                                                         </button>
                                                         <button
                                                             className="friends-btn friends-btn--reject"
-                                                            onClick={() => rejectRequest(request._id)}
+                                                            onClick={() => removeFriend(request._id)}
                                                             title="Rechazar solicitud"
                                                         >
                                                             <FaTimes />
@@ -272,7 +290,52 @@ const FriendsModal = ({ isOpen, onClose }) => {
                             </>
                         )}
 
-                        {/* PESTAÑA 3: Formulario para Agregar Amigo */}
+                        {/* PESTAÑA 3: Solicitudes Enviadas */}
+                        {!loading && activeTab === 'sent' && (
+                            <>
+                                {sentRequests.length === 0 ? (
+                                    <div className="friends-empty-state">
+                                        <FaInfoCircle className="friends-empty-icon" />
+                                        <p>No tienes solicitudes de amistad enviadas.</p>
+                                    </div>
+                                ) : (
+                                    <div className="friends-list">
+                                        {sentRequests.map((request) => {
+                                            // En solicitudes enviadas por nosotros, mostramos la información del destinatario
+                                            const recipientInfo = request.recipient
+                                            if (!recipientInfo) return null
+
+                                            const displayName = recipientInfo.user_name || recipientInfo.name || 'Usuario'
+                                            return (
+                                                <div className="friends-card" key={request._id}>
+                                                    <div className="friends-card__info">
+                                                        <div className="friends-avatar pending">
+                                                            {getInitials(displayName)}
+                                                        </div>
+                                                        <div className="friends-details">
+                                                            <span className="friends-name">{displayName}</span>
+                                                            <span className="friends-email">{recipientInfo.email}</span>
+                                                        </div>
+                                                    </div>
+                                                    {/* Acciones de Cancelar */}
+                                                    <div className="friends-actions">
+                                                        <button
+                                                            className="friends-btn friends-btn--cancel"
+                                                            onClick={() => removeFriend(request._id)}
+                                                            title="Cancelar Solicitud"
+                                                        >
+                                                            <MdCancel />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {/* PESTAÑA 4: Formulario para Agregar Amigo */}
                         {!loading && activeTab === 'add' && (
                             <form className="friends-add-form" onSubmit={handleSendRequest}>
                                 <div className="friends-form-group">

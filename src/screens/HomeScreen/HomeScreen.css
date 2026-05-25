@@ -127,13 +127,21 @@
   min-width: 18px;
   text-align: center;
   animation: pulse-nav-badge 2s infinite;
-  box-shadow: 0 0 8px rgba(255, 23, 68, 0.4);
 }
 
 @keyframes pulse-nav-badge {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.15); box-shadow: 0 0 12px rgba(255, 23, 68, 0.6); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(255, 23, 68, 0.6);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Mobile Toggle Hamburger */

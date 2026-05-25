@@ -1,9 +1,11 @@
-import { useCallback, useState } from "react"
+import { useCallback, useContext, useState } from "react"
 import useRequest from "./useRequest"
 import { deleteFriendship, getFriends, getPendingRequests, sendFriendshipRequest, updateRequestStatus } from "../service/friendship.service.js"
 import FRIENDSHIP_REQUEST_STATUS from "../constants/friendshipRequestStatus.js"
+import { AuthContext } from "../context/AuthContext.jsx"
 
 export default function useFriends() {
+    const { user } = useContext(AuthContext)
     //1-Estados locales
     const [friends, setFriends] = useState([])
     const [pendingRequest, setPendingRequests] = useState([])
@@ -38,7 +40,7 @@ export default function useFriends() {
         }, [sendRequest]
     )
 
-    //3- Funcion: Enviar Solicitud
+    //3- Funcion: Obtener solicitudes pendientes
     const fetchPendingRequests = useCallback(
         async () => {
             await sendRequest(
@@ -102,24 +104,24 @@ export default function useFriends() {
         )
     }
 
-    //6- Función: Rechazar solicitud de amistad recibida
-    const rejectRequest = async (id) => {
-        setSucces(null)
-        await sendRequest({
-            requestCb: async () => {
-                const res = await updateRequestStatus(id, FRIENDSHIP_REQUEST_STATUS.REJECTED)
-                if (res.ok) {
-                    //si se rechazo correctmente la solicitud refrescamos solo la lista de pendientes
-                    const pendingRes = await getPendingRequests()
-                    if (pendingRes.ok) {
-                        setPendingRequests(pendingRes.data)
+    /*     //6- Función: Rechazar solicitud de amistad recibida
+        const rejectRequest = async (id) => {
+            setSucces(null)
+            await sendRequest({
+                requestCb: async () => {
+                    const res = await updateRequestStatus(id, FRIENDSHIP_REQUEST_STATUS.REJECTED)
+                    if (res.ok) {
+                        //si se rechazo correctmente la solicitud refrescamos solo la lista de pendientes
+                        const pendingRes = await getPendingRequests()
+                        if (pendingRes.ok) {
+                            setPendingRequests(pendingRes.data)
+                        }
+                        setSucces('¡Solicitud rechazada!')
                     }
-                    setSucces('¡Solicitud rechazada!')
+                    return res
                 }
-                return res
-            }
-        })
-    }
+            })
+        } */
 
     //7- Función: Eliminar amigo (o cancelar solicitud enviada)
     const removeFriend = async (id) => {
@@ -130,11 +132,27 @@ export default function useFriends() {
                 if (res.ok) {
                     //Si elimina correctamente, refrescamos la lista de amigos
                     const friendsRes = await getFriends()
+                    const requestRes = await getPendingRequests()
+                    if (res.data.status === FRIENDSHIP_REQUEST_STATUS.ACCEPTED) {
+                        setSucces('¡Amigo eliminado correctamente!')
+                    }
+                    if (res.data.status === FRIENDSHIP_REQUEST_STATUS.PENDING) {
+                        setSucces('¡Solicitud de amistad rechazada correctamente!')
+                    }
+
+                    if (res.data.status === FRIENDSHIP_REQUEST_STATUS.PENDING && res.data.requester === user.id) {
+                        setSucces('¡Solicitud de amistad cancelada correctamente!')
+                    }
+
                     if (friendsRes.ok) {
                         setFriends(friendsRes.data)
                     }
-                    setSucces('¡Amigo eliminado correctamente!')
+                    if (requestRes.ok) {
+                        setPendingRequests(requestRes.data)
+                    }
+
                 }
+                console.log('FRIENDSHIP: ', res)
                 return res
             }
         })
@@ -158,7 +176,6 @@ export default function useFriends() {
         fetchPendingRequests,
         sendFriendship,
         acceptRequest,
-        rejectRequest,
         removeFriend,
         clearMessages
     }

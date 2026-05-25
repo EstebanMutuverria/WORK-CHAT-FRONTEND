@@ -1,6 +1,5 @@
 const FRIENDSHIP_REQUEST_STATUS = {
     ACCEPTED: 'accepted',
-    REJECTED: 'rejected',
     PENDING: 'pending'
 }
 
