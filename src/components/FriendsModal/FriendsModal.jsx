@@ -170,7 +170,7 @@ const FriendsModal = ({ isOpen, onClose }) => {
                         {/* Spinner de Carga */}
                         {loading && (
                             <div className="friends-loader">
-                                <div className="spinner">Cargando...</div>
+                                <div className="spinner"></div>
                             </div>
                         )}
 
