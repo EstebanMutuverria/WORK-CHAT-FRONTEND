@@ -98,9 +98,9 @@ const HomeScreen = () => {
                             </Link>
                         </li>
                         <li className="home-nav__item">
-                            <button 
-                                onClick={() => { setIsFriendsModalOpen(true); setIsMenuOpen(false); }} 
-                                className="home-nav__btn home-nav__btn--friends"
+                            <button
+                                onClick={() => { setIsFriendsModalOpen(true); setIsMenuOpen(false); }}
+                                className="home-nav__link"
                             >
                                 <span className="home-nav__icon"><FaUsers /></span>
                                 Amigos
