@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { IoSend, IoClose } from 'react-icons/io5';
+import { IoSend, IoClose, IoHappyOutline } from 'react-icons/io5';
+import EmojiPicker from 'emoji-picker-react';
 import useForm from '../../hooks/useForm';
 import useRequest from '../../hooks/useRequest';
 import { createMessage } from '../../service/message.service.js';
 import './Messages.css';
-import { MdOutlineAttachFile } from "react-icons/md";
+import { MdOutlineAttachFile, MdOutlineImage } from "react-icons/md";
 
 const MessageInput = ({ workspace_id, channel_id, onMessageSent }) => {
     const FORM_FIELDS_NAME = {
@@ -19,12 +20,17 @@ const MessageInput = ({ workspace_id, channel_id, onMessageSent }) => {
         handleChangeInput,
         onSubmit,
         formState,
+        setFields,
         resetForm
     } = useForm({ initialFormState, submitFn: onSubmitMessage })
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [filePreview, setFilePreview] = useState(null);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    
     const fileInputRef = useRef(null);
+    const textareaRef = useRef(null);
+    const emojiPickerRef = useRef(null);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -60,7 +66,48 @@ const MessageInput = ({ workspace_id, channel_id, onMessageSent }) => {
             handleCancelFile()
             if (onMessageSent) onMessageSent()
         }
-    }, [response, onMessageSent])
+    }, [response])
+
+    // Cerrar el selector de emojis al hacer clic afuera
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target)) {
+                setShowEmojiPicker(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Auto-ajustar la altura del textarea dinámicamente al escribir
+    useEffect(() => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${Math.min(textarea.scrollHeight, 180)}px`;
+        }
+    }, [formState[FORM_FIELDS_NAME.CONTENT]]);
+
+    const handleEmojiSelect = (emoji) => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = formState[FORM_FIELDS_NAME.CONTENT] || '';
+        const before = text.substring(0, start);
+        const after = text.substring(end, text.length);
+        const newValue = before + emoji + after;
+
+        setFields({ [FORM_FIELDS_NAME.CONTENT]: newValue });
+
+        // Devolver el foco al textarea y posicionar el cursor después del emoji insertado
+        setTimeout(() => {
+            textarea.focus();
+            const newCursorPos = start + emoji.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+        }, 0);
+    };
 
     function onSubmitMessage(formState) {
         if (!formState[FORM_FIELDS_NAME.CONTENT].trim() && !selectedFile) return;
@@ -73,70 +120,108 @@ const MessageInput = ({ workspace_id, channel_id, onMessageSent }) => {
     }
 
     return (
-        <div className="message-input-container">
-            <form onSubmit={onSubmit} className="message-input-form">
+        <div className="message-input-container" style={{ position: 'relative' }}>
+            {showEmojiPicker && (
+                <div className="emoji-picker-popup" ref={emojiPickerRef}>
+                    <EmojiPicker
+                        onEmojiClick={(emojiData) => handleEmojiSelect(emojiData.emoji)}
+                        theme="dark"
+                        searchPlaceholder="Buscar emoji..."
+                        width="100%"
+                        height={350}
+                        previewConfig={{ showPreview: false }}
+                        skinTonesDisabled
+                    />
+                </div>
+            )}
+
+            <form onSubmit={onSubmit} className="message-input-form-modern">
                 {selectedFile && (
-                    <div className="file-preview-container">
-                        {filePreview ? (
-                            <img src={filePreview} alt="Preview" className="image-preview" />
-                        ) : (
-                            <div className="generic-file-preview">
-                                <span>{selectedFile.name}</span>
-                            </div>
-                        )}
-                        <button type="button" onClick={handleCancelFile} className="cancel-file-btn">
-                            <IoClose />
-                        </button>
+                    <div className="file-preview-glass-container">
+                        <div className="file-preview-wrapper">
+                            {filePreview ? (
+                                <img src={filePreview} alt="Preview" className="modern-image-preview" />
+                            ) : (
+                                <div className="modern-generic-file-preview">
+                                    <MdOutlineImage className="file-icon" />
+                                    <span>{selectedFile.name}</span>
+                                </div>
+                            )}
+                            <button type="button" onClick={handleCancelFile} className="modern-cancel-file-btn" title="Quitar archivo">
+                                <IoClose />
+                            </button>
+                        </div>
                     </div>
                 )}
-                <textarea
-                    name={FORM_FIELDS_NAME.CONTENT}
-                    id={FORM_FIELDS_NAME.CONTENT}
-                    placeholder='Escribe tu mensaje...'
-                    onChange={handleChangeInput}
-                    value={formState[FORM_FIELDS_NAME.CONTENT]}
-                    className="message-input-field"
-                    autoComplete='off'
-                    required={!selectedFile}
-                    autoFocus
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            onSubmit(e);
-                        }
-                    }}
-                />
-                <div className="message-input-controls">
-                    <input 
-                        type="file" 
-                        id="file-input" 
-                        className="file-input" 
-                        style={{ display: 'none' }} 
-                        onChange={handleFileChange}
-                        ref={fileInputRef}
-                        accept="image/*"
+                
+                <div className="message-input-row">
+                    <textarea
+                        ref={textareaRef}
+                        name={FORM_FIELDS_NAME.CONTENT}
+                        id={FORM_FIELDS_NAME.CONTENT}
+                        placeholder='Escribe un mensaje aquí...'
+                        onChange={handleChangeInput}
+                        value={formState[FORM_FIELDS_NAME.CONTENT]}
+                        className="message-input-field-modern"
+                        autoComplete='off'
+                        required={!selectedFile}
+                        autoFocus
+                        rows="1"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                onSubmit(e);
+                            }
+                        }}
                     />
-                    <button
-                        type="button"
-                        title="Subir archivo"
-                        className="add-file-btn"
-                        onClick={() => fileInputRef.current.click()}
-                        disabled={loading}
-                    >
-                        <MdOutlineAttachFile />
-                    </button>
-                    <button
-                        type="submit"
-                        disabled={loading || (!formState[FORM_FIELDS_NAME.CONTENT].trim() && !selectedFile)}
-                        className="send-btn"
-                        title="Enviar mensaje"
-                    >
-                        {loading ? (
-                            <div className="spinner" style={{ width: '14px', height: '14px' }}></div>
-                        ) : (
-                            <IoSend />
-                        )}
-                    </button>
+                </div>
+
+                <div className="message-input-action-bar">
+                    <div className="message-input-left-tools">
+                        <input
+                            type="file"
+                            id="file-input"
+                            className="file-input"
+                            style={{ display: 'none' }}
+                            onChange={handleFileChange}
+                            ref={fileInputRef}
+                            accept="image/*"
+                        />
+                        <button
+                            type="button"
+                            title="Subir imagen o archivo"
+                            className="tool-btn-modern attach-btn"
+                            onClick={() => fileInputRef.current.click()}
+                            disabled={loading}
+                        >
+                            <MdOutlineAttachFile />
+                        </button>
+                        
+                        <button
+                            type="button"
+                            title="Emojis"
+                            className={`tool-btn-modern emoji-btn ${showEmojiPicker ? 'active' : ''}`}
+                            disabled={loading}
+                            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                        >
+                            <IoHappyOutline />
+                        </button>
+                    </div>
+
+                    <div className="message-input-right-tools">
+                        <button
+                            type="submit"
+                            disabled={loading || (!formState[FORM_FIELDS_NAME.CONTENT].trim() && !selectedFile)}
+                            className="send-btn-modern"
+                            title="Enviar mensaje"
+                        >
+                            {loading ? (
+                                <div className="modern-spinner"></div>
+                            ) : (
+                                <IoSend className="send-icon" />
+                            )}
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -144,3 +229,4 @@ const MessageInput = ({ workspace_id, channel_id, onMessageSent }) => {
 };
 
 export default MessageInput;
+
