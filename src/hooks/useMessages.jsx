@@ -1,73 +1,74 @@
 import { useState, useCallback, useEffect } from 'react'
 import useRequest from './useRequest'
 import { getMessages, deleteMessage } from '../service/message.service'
-import ENVIRONMENT from '../config/environment.config'
 
-/*
-    useMessages centraliza toda la lógica del chat de un canal:
-    - Obtener mensajes del servidor
-    - Escuchar nuevos mensajes en tiempo real vía Socket.io
-    - Iniciar el flujo de eliminación
-    - Confirmar la eliminación y refrescar la lista
+/**
+ * Hook useMessages:
+ * Centraliza toda la lógica de obtención y eliminación de mensajes de un canal,
+ * siguiendo el patrón estandarizado de hooks del proyecto.
+ */
+export default function useMessages({ workspace_id, channel_id }) {
+    //1-Estados locales
+    const [messages, setMessages] = useState([]) // Estado local de mensajes para poder actualizarlos en tiempo real
+    const [messageToDelete, setMessageToDelete] = useState(null) // ID del mensaje que el usuario quiere eliminar
 
-    USO:
-    const {
-        messages, loading, fetchMessages,
-        handleRequestDelete,
-        handleConfirmDelete, handleCloseDeleteModal,
-        isDeleteModalOpen, deleteLoading
-    } = useMessages({ workspace_id, channel_id })
-*/
+    //Instanciamos el useRequest
+    const fetchRequest = useRequest() // Un hook de consulta para obtener mensajes
+    const deleteRequest = useRequest() // Un hook de consulta separado para eliminar
 
-function useMessages({ workspace_id, channel_id }) {
-    // Estado local de mensajes para poder actualizarlos en tiempo real
-    const [messages, setMessages] = useState([])
-    // ID del mensaje que el usuario quiere eliminar
-    const [messageToDelete, setMessageToDelete] = useState(null)
+    //2- Funcion: Obtener Mensajes
+    const fetchMessages = useCallback(
+        async () => {
+            if (!workspace_id || !channel_id) return
+            await fetchRequest.sendRequest(
+                {
+                    requestCb: async () => {
+                        const res = await getMessages(workspace_id, channel_id)
+                        return res
+                    }
+                }
+            )
+        }, [workspace_id, channel_id, fetchRequest]
+    )
 
-    // Un hook de consulta para obtener mensajes
-    const fetchRequest = useRequest()
-    // Un hook de consulta separado para eliminar
-    const deleteRequest = useRequest()
-
-    // Pide los mensajes al servidor
-    const fetchMessages = useCallback(() => {
-        if (!workspace_id || !channel_id) return
-        fetchRequest.sendRequest({
-            requestCb: () => getMessages(workspace_id, channel_id)
-        })
-    }, [workspace_id, channel_id])
-
-    // Actualiza el estado local cuando se reciben mensajes de la API
+    // Efecto para sincronizar el estado local cuando se reciben mensajes de la API
     useEffect(() => {
         if (fetchRequest.response?.data?.messages) {
             setMessages(fetchRequest.response.data.messages)
         }
     }, [fetchRequest.response])
 
-    // Llamado cuando el usuario presiona "Eliminar" en un MessageItem.
-    const handleRequestDelete = (message_id) => {
+    //3- Función: Iniciar eliminación de mensaje
+    const handleRequestDelete = useCallback((message_id) => {
         setMessageToDelete(message_id)
-    }
+    }, [])
 
-    // Llamado cuando el usuario confirma la eliminación.
-    const handleConfirmDelete = async () => {
-        if (!messageToDelete) return
-        await deleteRequest.sendRequest({
-            requestCb: () => deleteMessage(workspace_id, channel_id, messageToDelete)
-        })
+    //4- Función: Confirmar eliminación de mensaje
+    const handleConfirmDelete = useCallback(
+        async () => {
+            if (!messageToDelete) return
+            await deleteRequest.sendRequest(
+                {
+                    requestCb: async () => {
+                        const res = await deleteMessage(workspace_id, channel_id, messageToDelete)
+                        return res
+                    }
+                }
+            )
+            setMessageToDelete(null)
+            // Eliminamos el mensaje localmente para feedback instantáneo
+            setMessages((prev) => prev.filter(m => m._id !== messageToDelete))
+        }, [workspace_id, channel_id, messageToDelete, deleteRequest]
+    )
+
+    //5- Función: Cancelar o cerrar modal de eliminación
+    const handleCloseDeleteModal = useCallback(() => {
         setMessageToDelete(null)
-        // Eliminamos el mensaje localmente para feedback instantáneo
-        setMessages((prev) => prev.filter(m => m._id !== messageToDelete))
-    }
+    }, [])
 
-    // Llamado cuando el usuario cancela o cierra el modal.
-    const handleCloseDeleteModal = () => {
-        setMessageToDelete(null)
-    }
-
+    //6- Retornamos todo lo necesario para la UI (el componente que se encargara de renderizar los datos a el usuario)
     return {
-        messages, // Ahora retornamos el estado local sincronizado
+        messages,
         loading: fetchRequest.loading,
         error: fetchRequest.error,
         fetchMessages,
@@ -78,5 +79,3 @@ function useMessages({ workspace_id, channel_id }) {
         deleteLoading: deleteRequest.loading,
     }
 }
-
-export default useMessages

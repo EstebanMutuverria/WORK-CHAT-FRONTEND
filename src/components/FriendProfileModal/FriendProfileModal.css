@@ -1,0 +1,222 @@
+/* FriendProfileModal.css - Modern glassmorphic styles for friend profiles */
+
+/* Content Layout */
+.friend-profile-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+}
+
+/* Avatar styling */
+.friend-profile-avatar-wrapper {
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+.friend-profile-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(0, 176, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 176, 255, 0.25);
+    background: linear-gradient(135deg, #00b0ff, #00e5ff);
+    color: #121212;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+    font-weight: 800;
+}
+
+.friend-profile-status-indicator {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #00e676; /* Active/Accepted status */
+    border: 3.5px solid #1d1d24;
+    box-shadow: 0 2px 6px rgba(0, 230, 118, 0.4);
+}
+
+/* Text details */
+.friend-profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.friend-profile-username {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.friend-profile-badge {
+    background: rgba(0, 176, 255, 0.12);
+    border: 1px solid rgba(0, 176, 255, 0.25);
+    color: #00b0ff;
+    padding: 0.2rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    align-self: center;
+    margin-bottom: 0.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.friend-profile-email-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.95rem;
+}
+
+.friend-profile-email-icon {
+    color: #00b0ff;
+    opacity: 0.8;
+}
+
+/* Divider line */
+.friend-profile-divider {
+    width: 100%;
+    height: 1px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 90%);
+    margin: 0.5rem 0;
+}
+
+/* Social media container */
+.friend-profile-socials {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.8rem;
+}
+
+.friend-profile-socials-title {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 0.2rem;
+    text-align: left;
+    padding-left: 0.2rem;
+}
+
+.friend-profile-social-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+    width: 100%;
+}
+
+/* If single social, span 2 columns */
+.friend-profile-social-buttons.single-social {
+    grid-template-columns: 1fr;
+}
+
+/* Social link button styling */
+.friend-social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.85rem;
+    border-radius: 14px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.friend-social-btn--github {
+    background: rgba(36, 41, 47, 0.4);
+    color: #fff;
+}
+.friend-social-btn--github:hover {
+    background: rgba(36, 41, 47, 0.85);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.friend-social-btn--linkedin {
+    background: rgba(10, 102, 194, 0.1);
+    color: #0077b5;
+    border-color: rgba(10, 102, 194, 0.2);
+}
+.friend-social-btn--linkedin:hover {
+    background: #0a66c2;
+    color: #fff;
+    border-color: #0a66c2;
+    box-shadow: 0 4px 15px rgba(10, 102, 194, 0.4);
+    transform: translateY(-2px);
+}
+
+.friend-social-btn--twitter {
+    background: rgba(29, 161, 242, 0.1);
+    color: #1da1f2;
+    border-color: rgba(29, 161, 242, 0.2);
+}
+.friend-social-btn--twitter:hover {
+    background: #1da1f2;
+    color: #fff;
+    border-color: #1da1f2;
+    box-shadow: 0 4px 15px rgba(29, 161, 242, 0.4);
+    transform: translateY(-2px);
+}
+
+.friend-social-btn--instagram {
+    background: rgba(225, 48, 108, 0.1);
+    color: #e1306c;
+    border-color: rgba(225, 48, 108, 0.2);
+}
+.friend-social-btn--instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(220, 39, 67, 0.4);
+    transform: translateY(-2px);
+}
+
+.friend-profile-no-socials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    padding: 1rem;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    width: 100%;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+    .friend-profile-username {
+        font-size: 1.5rem;
+    }
+
+    .friend-profile-social-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .friend-profile-avatar {
+        width: 90px;
+        height: 90px;
+        font-size: 2.3rem;
+    }
+}

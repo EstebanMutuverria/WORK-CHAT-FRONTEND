@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react'
 import Modal from '../Modal/Modal'
 import DeleteConfirmModal from '../DeleteConfirmModal/DeleteConfirmModal'
+import FriendProfileModal from '../FriendProfileModal/FriendProfileModal'
 import useFriends from '../../hooks/useFriends'
 import { AuthContext } from '../../context/AuthContext'
-import { FaUsers, FaUserClock, FaUserPlus, FaTrash, FaCheck, FaTimes, FaEnvelope, FaInfoCircle } from 'react-icons/fa'
+import { FaUsers, FaUserClock, FaUserPlus, FaTrash, FaCheck, FaTimes, FaEnvelope, FaInfoCircle, FaEye } from 'react-icons/fa'
 import { BiMailSend } from "react-icons/bi";
 import { MdCancel } from "react-icons/md";
 import './FriendsModal.css'
@@ -24,6 +25,10 @@ const FriendsModal = ({ isOpen, onClose }) => {
     // Estados específicos para controlar el modal de confirmación de eliminación
     const [isDeleteOpen, setIsDeleteOpen] = useState(false) // Si el DeleteConfirmModal está visible
     const [friendshipToDelete, setFriendshipToDelete] = useState(null) // La relación de amistad específica que se desea romper
+
+    // Estados específicos para controlar el modal de perfil de amigo
+    const [isProfileOpen, setIsProfileOpen] = useState(false) // Si el FriendProfileModal está visible
+    const [friendForProfile, setFriendForProfile] = useState(null) // Los datos del amigo que queremos visualizar
 
     // 2. Consumo de Contextos y Hooks
     const { user } = useContext(AuthContext) // Obtenemos el usuario en sesión para saber cuál extremo de la relación somos
@@ -61,6 +66,8 @@ const FriendsModal = ({ isOpen, onClose }) => {
             clearMessages()
             setActiveTab('friends')
             setEmailInput('')
+            setIsProfileOpen(false)
+            setFriendForProfile(null)
         }
     }, [isOpen, fetchFriends, fetchPendingRequests, clearMessages])
 
@@ -222,6 +229,16 @@ const FriendsModal = ({ isOpen, onClose }) => {
                                                         </div>
                                                     </div>
                                                     <div className="friends-actions">
+                                                        <button
+                                                            className="friends-btn friends-btn--profile"
+                                                            onClick={() => {
+                                                                setFriendForProfile(friendInfo)
+                                                                setIsProfileOpen(true)
+                                                            }}
+                                                            title="Ver perfil"
+                                                        >
+                                                            <FaEye />
+                                                        </button>
                                                         {/* Al hacer clic, abrimos el modal de confirmación en lugar de window.confirm */}
                                                         <button
                                                             className="friends-btn friends-btn--delete"
@@ -385,6 +402,16 @@ const FriendsModal = ({ isOpen, onClose }) => {
                 }
                 confirmText="Eliminar"
                 loading={loading}
+            />
+
+            {/* Modal de visualización del perfil del amigo */}
+            <FriendProfileModal
+                isOpen={isProfileOpen}
+                onClose={() => {
+                    setIsProfileOpen(false)
+                    setFriendForProfile(null)
+                }}
+                friendInfo={friendForProfile}
             />
         </>
     )
