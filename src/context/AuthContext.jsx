@@ -34,9 +34,29 @@ export const LOCALSTORAGE_TOKEN_KEY = 'slack_auth_token'
  */
 function decodeToken(token) {
     try {
-        const payload = token.split('.')[1] //Obtiene la segunda parte del token (payload)
-        const decodePayload = atob(payload) //Decodifica el payload
-        return JSON.parse(decodePayload) //Convierte el payload decodificado en un objeto
+        const base64Url = token.split('.')[1] //Obtiene la segunda parte del token (payload)
+        if (!base64Url) return null
+
+        // Reemplazar caracteres de base64url a base64 estándar
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+
+        // Agregar relleno (padding) si es necesario
+        const pad = base64.length % 4
+        if (pad) {
+            if (pad === 1) return null
+            base64 += new Array(5 - pad).join('=')
+        }
+
+        const decodePayload = atob(base64) //Decodifica el payload
+        
+        // Decodificar correctamente como UTF-8 para soportar tildes, ñ y caracteres especiales
+        const jsonPayload = decodeURIComponent(
+            decodePayload.split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+            }).join('')
+        )
+
+        return JSON.parse(jsonPayload) //Convierte el payload decodificado en un objeto
     } catch (error) {
         return null
     }
