@@ -140,7 +140,7 @@ export default function useFriends() {
                         setSucces('¡Solicitud de amistad rechazada correctamente!')
                     }
 
-                    if (res.data.status === FRIENDSHIP_REQUEST_STATUS.PENDING && res.data.requester === user.id) {
+                    if (res.data.status === FRIENDSHIP_REQUEST_STATUS.PENDING && res.data.requester === user?.id) {
                         setSucces('¡Solicitud de amistad cancelada correctamente!')
                     }
 

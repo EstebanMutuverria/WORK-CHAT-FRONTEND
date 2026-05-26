@@ -52,12 +52,12 @@ const ProfileScreen = () => {
     } = useRequest()
 
     const initialFormState = {
-        [PROFILE_USER_FIELD_NAMES.NAME]: user.name,
-        [PROFILE_USER_FIELD_NAMES.EMAIL]: user.email,
-        [PROFILE_USER_FIELD_NAMES.GITHUB]: user.github || '',
-        [PROFILE_USER_FIELD_NAMES.LINKEDIN]: user.linkedin || '',
-        [PROFILE_USER_FIELD_NAMES.TWITTER]: user.twitter || '',
-        [PROFILE_USER_FIELD_NAMES.INSTAGRAM]: user.instagram || ''
+        [PROFILE_USER_FIELD_NAMES.NAME]: user?.name || '',
+        [PROFILE_USER_FIELD_NAMES.EMAIL]: user?.email || '',
+        [PROFILE_USER_FIELD_NAMES.GITHUB]: user?.github || '',
+        [PROFILE_USER_FIELD_NAMES.LINKEDIN]: user?.linkedin || '',
+        [PROFILE_USER_FIELD_NAMES.TWITTER]: user?.twitter || '',
+        [PROFILE_USER_FIELD_NAMES.INSTAGRAM]: user?.instagram || ''
     }
 
     const {
@@ -71,7 +71,7 @@ const ProfileScreen = () => {
     async function onSaveProfile(formState) {
         await sendRequest({
             requestCb: async () => {
-                const response = await updateUser(formState, user.id);
+                const response = await updateUser(formState, user?.id);
                 if (response.status === 200) {
                     updateToken(response.data.auth_token)
                 }
@@ -84,7 +84,7 @@ const ProfileScreen = () => {
     async function handleDeleteAccount() {
         await sendRequest({
             requestCb: async () => {
-                const response = await deleteUser(user.id)
+                const response = await deleteUser(user?.id)
                 if (response.ok) {
                     logout()
                 }
@@ -155,7 +155,7 @@ const ProfileScreen = () => {
 
                 <div className="profile-card">
                     <div className="profile-avatar">
-                        {getInitials(user.name)}
+                        {getInitials(user?.name)}
                     </div>
 
                     <form className="profile-info" onSubmit={onSubmit}>
@@ -166,7 +166,7 @@ const ProfileScreen = () => {
 
                         <div className="profile-field">
                             <label className="profile-field__label" htmlFor={PROFILE_USER_FIELD_NAMES.EMAIL}>Correo electrónico</label>
-                            <input type="email" className="profile-field__value profile-field__disabled" value={user.email} disabled />
+                            <input type="email" className="profile-field__value profile-field__disabled" value={user?.email || ''} disabled />
                         </div>
                         {
                             SOCIAL_FIELD_CONFIG.map((field) => (

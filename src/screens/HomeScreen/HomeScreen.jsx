@@ -123,7 +123,7 @@ const HomeScreen = () => {
                 <div className="home-content-container">
                     <h1 className="home-hero__title">
                         <span className="home-hero__wave">👋</span>
-                        <span className="home-hero__greeting">¡Hola, {user.name}!</span>
+                        <span className="home-hero__greeting">¡Hola, {user?.name || 'Usuario'}!</span>
                     </h1>
                     {loading && (
                         <div className="loading-state">
