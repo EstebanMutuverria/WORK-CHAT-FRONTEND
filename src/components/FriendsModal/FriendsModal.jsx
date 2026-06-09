@@ -2,9 +2,10 @@ import React, { useEffect, useState, useContext } from 'react'
 import Modal from '../Modal/Modal'
 import DeleteConfirmModal from '../DeleteConfirmModal/DeleteConfirmModal'
 import FriendProfileModal from '../FriendProfileModal/FriendProfileModal'
+import PrivateChatModal from './PrivateChatModal'
 import useFriends from '../../hooks/useFriends'
 import { AuthContext } from '../../context/AuthContext'
-import { FaUsers, FaUserClock, FaUserPlus, FaTrash, FaCheck, FaTimes, FaEnvelope, FaInfoCircle, FaEye } from 'react-icons/fa'
+import { FaUsers, FaUserClock, FaUserPlus, FaTrash, FaCheck, FaTimes, FaEnvelope, FaInfoCircle, FaEye, FaComment } from 'react-icons/fa'
 import { BiMailSend } from "react-icons/bi";
 import { MdCancel } from "react-icons/md";
 import './FriendsModal.css'
@@ -29,6 +30,13 @@ const FriendsModal = ({ isOpen, onClose }) => {
     // Estados específicos para controlar el modal de perfil de amigo
     const [isProfileOpen, setIsProfileOpen] = useState(false) // Si el FriendProfileModal está visible
     const [friendForProfile, setFriendForProfile] = useState(null) // Los datos del amigo que queremos visualizar
+
+    // Estados específicos para controlar el modal de chat privado
+    const [isChatOpen, setIsChatOpen] = useState(false) // Si el PrivateChatModal está visible
+    const [friendForChat, setFriendForChat] = useState(null) // Los datos del amigo con el que queremos chatear
+
+    // Estado para la barra de búsqueda de amigos
+    const [searchQuery, setSearchQuery] = useState('') // El texto ingresado en la barra de búsqueda
 
     // 2. Consumo de Contextos y Hooks
     const { user } = useContext(AuthContext) // Obtenemos el usuario en sesión para saber cuál extremo de la relación somos
@@ -68,6 +76,9 @@ const FriendsModal = ({ isOpen, onClose }) => {
             setEmailInput('')
             setIsProfileOpen(false)
             setFriendForProfile(null)
+            setIsChatOpen(false)
+            setFriendForChat(null)
+            setSearchQuery('')
         }
     }, [isOpen, fetchFriends, fetchPendingRequests, clearMessages])
 
@@ -101,6 +112,16 @@ const FriendsModal = ({ isOpen, onClose }) => {
             .toUpperCase()
             .slice(0, 2)
     }
+
+    // Filtrar amigos por búsqueda en tiempo real (declarado después de getFriendDetails para evitar TDZ)
+    const filteredFriends = friends.filter((friendship) => {
+        const friendInfo = getFriendDetails(friendship)
+        if (!friendInfo) return false
+        const query = searchQuery.toLowerCase().trim()
+        const name = (friendInfo.user_name || '').toLowerCase()
+        const email = (friendInfo.email || '').toLowerCase()
+        return name.includes(query) || email.includes(query)
+    })
 
     // 5. Gestores de Eventos (Event Handlers)
 
@@ -204,15 +225,32 @@ const FriendsModal = ({ isOpen, onClose }) => {
                         {/* PESTAÑA 1: Lista de Amigos Aceptados */}
                         {!loading && activeTab === 'friends' && (
                             <>
+                                {friends.length > 0 && (
+                                    <div className="friends-search-container">
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar amigos por nombre o email..."
+                                            className="friends-search-input"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </div>
+                                )}
+
                                 {friends.length === 0 ? (
                                     <div className="friends-empty-state">
                                         <FaInfoCircle className="friends-empty-icon" />
                                         <p>Aún no tienes amigos agregados.</p>
                                         <p>¡Ve a la pestaña de agregar amigo para expandir tu red!</p>
                                     </div>
+                                ) : filteredFriends.length === 0 ? (
+                                    <div className="friends-empty-state">
+                                        <FaInfoCircle className="friends-empty-icon" />
+                                        <p>No se encontraron amigos que coincidan con la búsqueda.</p>
+                                    </div>
                                 ) : (
                                     <div className="friends-list">
-                                        {friends.map((friendship) => {
+                                        {filteredFriends.map((friendship) => {
                                             const friendInfo = getFriendDetails(friendship)
                                             if (!friendInfo) return null
 
@@ -229,6 +267,16 @@ const FriendsModal = ({ isOpen, onClose }) => {
                                                         </div>
                                                     </div>
                                                     <div className="friends-actions">
+                                                        <button
+                                                            className="friends-btn friends-btn--chat"
+                                                            onClick={() => {
+                                                                setFriendForChat(friendInfo)
+                                                                setIsChatOpen(true)
+                                                            }}
+                                                            title="Chatear"
+                                                        >
+                                                            <FaComment />
+                                                        </button>
                                                         <button
                                                             className="friends-btn friends-btn--profile"
                                                             onClick={() => {
@@ -412,6 +460,16 @@ const FriendsModal = ({ isOpen, onClose }) => {
                     setFriendForProfile(null)
                 }}
                 friendInfo={friendForProfile}
+            />
+
+            {/* Modal de chat privado */}
+            <PrivateChatModal
+                isOpen={isChatOpen}
+                onClose={() => {
+                    setIsChatOpen(false)
+                    setFriendForChat(null)
+                }}
+                friendInfo={friendForChat}
             />
         </>
     )

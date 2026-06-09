@@ -1,0 +1,145 @@
+/* Estilos del encabezado del chat privado */
+.private-chat-header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.private-chat-avatar-wrapper {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.private-chat-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.private-chat-avatar-initials {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.private-chat-header-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.private-chat-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary, #ffffff);
+    line-height: 1.2;
+}
+
+.private-chat-status {
+    font-size: 11px;
+    color: var(--color-text-secondary, rgba(255, 255, 255, 0.6));
+    font-weight: 400;
+}
+
+/* Cuerpo del chat */
+.private-chat-body {
+    display: flex;
+    flex-direction: column;
+    height: 60vh; /* Altura flexible dentro del modal */
+    max-height: 550px;
+    min-height: 380px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Contenedor de mensajes */
+.private-chat-messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 6px;
+    display: flex;
+    flex-direction: column;
+    /* Estilizar scrollbar para navegadores webkit */
+}
+
+.private-chat-messages-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.private-chat-messages-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.private-chat-messages-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.private-chat-messages-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Contenedor del input */
+.private-chat-input-container {
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: transparent;
+}
+
+/* Adaptación responsiva desde 320px en adelante */
+@media (max-width: 480px) {
+    .private-chat-body {
+        height: 70vh; /* Mayor porcentaje de pantalla en móviles */
+        max-height: none;
+        min-height: auto;
+    }
+    
+    .private-chat-header-title {
+        gap: 8px;
+    }
+
+    .private-chat-avatar-wrapper {
+        width: 32px;
+        height: 32px;
+    }
+
+    .private-chat-avatar-initials {
+        font-size: 12px;
+    }
+
+    .private-chat-name {
+        font-size: 14px;
+    }
+
+    .private-chat-status {
+        font-size: 10px;
+    }
+
+    /* Reducimos márgenes y padding en mensajes de chat privado en pantallas pequeñas */
+    .private-chat-messages-container {
+        padding: 8px 2px;
+    }
+}
+
+@media (max-width: 360px) {
+    .private-chat-body {
+        height: 75vh;
+    }
+
+    /* Ocultar estado "Mensaje Privado" en dispositivos extremadamente angostos si es necesario */
+    .private-chat-status {
+        display: none;
+    }
+    
+    .private-chat-name {
+        font-size: 13px;
+    }
+}
