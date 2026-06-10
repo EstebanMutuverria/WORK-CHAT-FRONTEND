@@ -230,6 +230,14 @@
     font-size: 1rem;
 }
 
+.avatar__img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 5px rgba(0, 176, 255, 0.4);
+}
+
 .friends-btn--profile {
     color: #00b0ff;
     background: rgba(0, 176, 255, 0.1);

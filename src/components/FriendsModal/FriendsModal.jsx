@@ -259,7 +259,10 @@ const FriendsModal = ({ isOpen, onClose }) => {
                                                 <div className="friends-card" key={friendship._id}>
                                                     <div className="friends-card__info">
                                                         <div className="friends-avatar">
-                                                            {getInitials(displayName)}
+                                                            {friendInfo.url_image ?
+                                                                <img className="avatar__img" src={friendInfo.url_image} alt={displayName} />
+                                                                : getInitials(displayName)
+                                                            }
                                                         </div>
                                                         <div className="friends-details">
                                                             <span className="friends-name">{displayName}</span>

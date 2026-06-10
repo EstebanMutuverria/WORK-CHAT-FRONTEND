@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useRef, useEffect } from 'react'
 import { AuthContext } from '../../context/AuthContext'
 import { Link } from 'react-router'
 import './ProfileScreen.css'
@@ -6,11 +6,12 @@ import useForm from '../../hooks/useForm'
 import useRequest from '../../hooks/useRequest'
 import { updateUser, deleteUser } from '../../service/user.service.js'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal/DeleteConfirmModal'
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaCamera, FaEdit, FaSignOutAlt, FaArrowLeft, FaTimes, FaSave } from "react-icons/fa";
 import { CiLinkedin } from "react-icons/ci";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { FaWhatsapp } from "react-icons/fa";
+import ENVIRONMENT from '../../config/environment.config.js'
 
 
 const ProfileScreen = () => {
@@ -21,9 +22,12 @@ const ProfileScreen = () => {
         GITHUB: 'github',
         LINKEDIN: 'linkedin',
         TWITTER: 'twitter',
-        INSTAGRAM: 'instagram'
+        INSTAGRAM: 'instagram',
+        URL_IMAGE: 'url_image',
+        URL_IMAGE_PREVIEW: 'url_imagePreview'
     }
     const { user, logout, updateUserContext, updateToken } = useContext(AuthContext)
+    const fileInputRef = useRef(null)
 
     const [isEditing, setIsEditing] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -40,7 +44,16 @@ const ProfileScreen = () => {
 
     function onCancel() {
         setIsEditing(false)
-        setFields(initialFormState)
+        setFields({
+            [PROFILE_USER_FIELD_NAMES.NAME]: user?.name || '',
+            [PROFILE_USER_FIELD_NAMES.EMAIL]: user?.email || '',
+            [PROFILE_USER_FIELD_NAMES.GITHUB]: user?.github || '',
+            [PROFILE_USER_FIELD_NAMES.LINKEDIN]: user?.linkedin || '',
+            [PROFILE_USER_FIELD_NAMES.TWITTER]: user?.twitter || '',
+            [PROFILE_USER_FIELD_NAMES.INSTAGRAM]: user?.instagram || '',
+            [PROFILE_USER_FIELD_NAMES.URL_IMAGE]: null,
+            [PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW]: null
+        })
     }
 
     const {
@@ -57,7 +70,9 @@ const ProfileScreen = () => {
         [PROFILE_USER_FIELD_NAMES.GITHUB]: user?.github || '',
         [PROFILE_USER_FIELD_NAMES.LINKEDIN]: user?.linkedin || '',
         [PROFILE_USER_FIELD_NAMES.TWITTER]: user?.twitter || '',
-        [PROFILE_USER_FIELD_NAMES.INSTAGRAM]: user?.instagram || ''
+        [PROFILE_USER_FIELD_NAMES.INSTAGRAM]: user?.instagram || '',
+        [PROFILE_USER_FIELD_NAMES.URL_IMAGE]: null,
+        [PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW]: null
     }
 
     const {
@@ -68,10 +83,35 @@ const ProfileScreen = () => {
         resetForm
     } = useForm({ initialFormState, submitFn: onSaveProfile })
 
+    useEffect(() => {
+        if (user) {
+            setFields({
+                [PROFILE_USER_FIELD_NAMES.NAME]: user.name || '',
+                [PROFILE_USER_FIELD_NAMES.EMAIL]: user.email || '',
+                [PROFILE_USER_FIELD_NAMES.GITHUB]: user.github || '',
+                [PROFILE_USER_FIELD_NAMES.LINKEDIN]: user.linkedin || '',
+                [PROFILE_USER_FIELD_NAMES.TWITTER]: user.twitter || '',
+                [PROFILE_USER_FIELD_NAMES.INSTAGRAM]: user.instagram || '',
+                [PROFILE_USER_FIELD_NAMES.URL_IMAGE]: null,
+                [PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW]: null
+            })
+        }
+    }, [user])
+
     async function onSaveProfile(formState) {
         await sendRequest({
             requestCb: async () => {
-                const response = await updateUser(formState, user?.id);
+                const response = await updateUser(
+                    {
+                        name: formState[PROFILE_USER_FIELD_NAMES.NAME],
+                        github: formState[PROFILE_USER_FIELD_NAMES.GITHUB],
+                        linkedin: formState[PROFILE_USER_FIELD_NAMES.LINKEDIN],
+                        twitter: formState[PROFILE_USER_FIELD_NAMES.TWITTER],
+                        instagram: formState[PROFILE_USER_FIELD_NAMES.INSTAGRAM],
+                        url_image: formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE]
+                    },
+                    user?.id
+                );
                 if (response.status === 200) {
                     updateToken(response.data.auth_token)
                 }
@@ -136,6 +176,10 @@ const ProfileScreen = () => {
         }
     ]
 
+    const currentUserImage = user?.url_image?.startsWith('http')
+        ? user.url_image
+        : user?.url_image ? ENVIRONMENT.API_URL + user.url_image : null
+
     return (
         <div className="profile-page">
             <header className="home-nav">
@@ -154,11 +198,39 @@ const ProfileScreen = () => {
                 </div>
 
                 <div className="profile-card">
-                    <div className="profile-avatar">
-                        {getInitials(user?.name)}
-                    </div>
-
                     <form className="profile-info" onSubmit={onSubmit}>
+                        <div className="profile-avatar-container">
+                            <div className="profile-avatar">
+                                {formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW] || currentUserImage ? (
+                                    <img
+                                        src={formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW] || currentUserImage}
+                                        alt={formState[PROFILE_USER_FIELD_NAMES.NAME]}
+                                        className="profile-avatar__img"
+                                    />
+                                ) : (
+                                    getInitials(user?.name)
+                                )}
+                                {isEditing && (
+                                    <button
+                                        type="button"
+                                        className="profile-avatar__edit-btn"
+                                        onClick={() => fileInputRef.current.click()}
+                                        disabled={loading}
+                                        title="Cambiar foto de perfil"
+                                    >
+                                        <FaCamera />
+                                    </button>
+                                )}
+                            </div>
+                            <input
+                                type="file"
+                                name={PROFILE_USER_FIELD_NAMES.URL_IMAGE}
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                onChange={handleChangeInput}
+                                accept="image/*"
+                            />
+                        </div>
                         <div className="profile-field">
                             <label className="profile-field__label" htmlFor={PROFILE_USER_FIELD_NAMES.NAME}>Nombre</label>
                             <input type="text" className={`profile-field__value ${!isEditing ? 'profile-field__disabled' : ''}`} value={formState[PROFILE_USER_FIELD_NAMES.NAME]} onChange={handleChangeInput} name={PROFILE_USER_FIELD_NAMES.NAME} disabled={!isEditing} />
@@ -217,22 +289,22 @@ const ProfileScreen = () => {
                             {!isEditing ? (
                                 <>
                                     <button type="button" className="btn btn--secondary profile-btn--edit" onClick={onEdit}>
-                                        <span>✏️</span> Editar perfil
+                                        <span><FaEdit /></span> Editar perfil
                                     </button>
                                     <button type="button" className="btn btn--danger profile-btn--logout" onClick={logout}>
-                                        <span>👋</span> Cerrar sesión
+                                        <span><FaSignOutAlt /></span> Cerrar sesión
                                     </button>
                                     <Link to="/home" className="profile-link--back">
-                                        <span>←</span> Volver al inicio
+                                        <span><FaArrowLeft /></span> Volver al inicio
                                     </Link>
                                 </>
                             ) : (
                                 <>
                                     <button type="button" className="btn btn--secondary profile-btn--cancel" onClick={onCancel}>
-                                        <span>X</span> Cancelar
+                                        <span><FaTimes /></span> Cancelar
                                     </button>
                                     <button type="submit" className="btn btn--primary profile-btn--save" disabled={loading || formState[PROFILE_USER_FIELD_NAMES.NAME] === ''}>
-                                        <span>💾</span> {loading ? 'Guardando...' : 'Guardar'}
+                                        <span><FaSave /></span> {loading ? 'Guardando...' : 'Guardar'}
                                     </button>
                                 </>
                             )}
