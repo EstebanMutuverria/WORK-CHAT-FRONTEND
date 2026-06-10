@@ -56,6 +56,29 @@
     background: var(--color-brand-secondary);
 }
 
+.ws-form__image-delete {
+    position: absolute;
+    bottom: -2px;
+    left: -2px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #ff4d4d;
+    color: white;
+    border: 3px solid var(--modal-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: var(--btn-transition);
+}
+
+.ws-form__image-delete:hover {
+    transform: scale(1.1) translateY(-1px);
+    background: #e01e5a;
+}
+
 .ws-form__image-help {
     font-size: var(--font-size-sm);
     color: var(--color-text-muted);

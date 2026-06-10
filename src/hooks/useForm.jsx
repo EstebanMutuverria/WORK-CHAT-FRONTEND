@@ -19,10 +19,10 @@ function useForm({ initialFormState, submitFn }) {
 
     function handleChangeInput(event) {
         const { name, value, type, files } = event.target
-        
+
         setFormState((prev) => {
             const newState = { ...prev }
-            
+
             if (type === 'file') {
                 const file = files[0]
                 newState[name] = file
@@ -33,7 +33,7 @@ function useForm({ initialFormState, submitFn }) {
             } else {
                 newState[name] = value
             }
-            
+
             return newState
         })
     }

@@ -46,12 +46,15 @@ export async function getWorkspaceById({ workspace_id }) {
 }
 
 //Utilizar form data para la imagen
-export async function updateWorkspace({ workspace_id, title, description, image }) {
+export async function updateWorkspace({ workspace_id, title, description, image, url_image }) {
     const formData = new FormData()
     formData.append('title', title)
     formData.append('description', description)
     if (image) {
         formData.append('image', image)
+    }
+    if (url_image !== undefined) {
+        formData.append('url_image', url_image || '')
     }
     const response_http = await authenticatedFetch(
         ENVIRONMENT.API_URL + '/api/workspaces/' + workspace_id,

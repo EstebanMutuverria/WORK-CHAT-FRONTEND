@@ -70,11 +70,19 @@
   overflow: visible;
 }
 
+.profile-avatar__img-wrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
 .profile-avatar__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: var(--radius-full);
 }
 
 .profile-avatar__edit-btn {
@@ -98,6 +106,30 @@
 
 .profile-avatar__edit-btn:hover {
   background: var(--color-brand-accent);
+  transform: scale(1.1);
+}
+
+.profile-avatar__delete-btn {
+  position: absolute;
+  bottom: -4px;
+  left: -4px;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background: #ff4d4d;
+  color: white;
+  border: 3px solid var(--color-bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-sm);
+}
+
+.profile-avatar__delete-btn:hover {
+  background: #e01e5a;
   transform: scale(1.1);
 }
 

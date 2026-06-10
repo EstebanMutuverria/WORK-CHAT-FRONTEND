@@ -12,6 +12,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { FaWhatsapp } from "react-icons/fa";
 import ENVIRONMENT from '../../config/environment.config.js'
+import { MdDelete } from 'react-icons/md'
 
 
 const ProfileScreen = () => {
@@ -51,7 +52,7 @@ const ProfileScreen = () => {
             [PROFILE_USER_FIELD_NAMES.LINKEDIN]: user?.linkedin || '',
             [PROFILE_USER_FIELD_NAMES.TWITTER]: user?.twitter || '',
             [PROFILE_USER_FIELD_NAMES.INSTAGRAM]: user?.instagram || '',
-            [PROFILE_USER_FIELD_NAMES.URL_IMAGE]: null,
+            [PROFILE_USER_FIELD_NAMES.URL_IMAGE]: user?.url_image || '',
             [PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW]: null
         })
     }
@@ -71,7 +72,7 @@ const ProfileScreen = () => {
         [PROFILE_USER_FIELD_NAMES.LINKEDIN]: user?.linkedin || '',
         [PROFILE_USER_FIELD_NAMES.TWITTER]: user?.twitter || '',
         [PROFILE_USER_FIELD_NAMES.INSTAGRAM]: user?.instagram || '',
-        [PROFILE_USER_FIELD_NAMES.URL_IMAGE]: null,
+        [PROFILE_USER_FIELD_NAMES.URL_IMAGE]: user?.url_image || '',
         [PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW]: null
     }
 
@@ -92,7 +93,7 @@ const ProfileScreen = () => {
                 [PROFILE_USER_FIELD_NAMES.LINKEDIN]: user.linkedin || '',
                 [PROFILE_USER_FIELD_NAMES.TWITTER]: user.twitter || '',
                 [PROFILE_USER_FIELD_NAMES.INSTAGRAM]: user.instagram || '',
-                [PROFILE_USER_FIELD_NAMES.URL_IMAGE]: null,
+                [PROFILE_USER_FIELD_NAMES.URL_IMAGE]: user.url_image || '',
                 [PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW]: null
             })
         }
@@ -176,9 +177,19 @@ const ProfileScreen = () => {
         }
     ]
 
-    const currentUserImage = user?.url_image?.startsWith('http')
-        ? user.url_image
-        : user?.url_image ? ENVIRONMENT.API_URL + user.url_image : null
+    const displayImage = formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW] || 
+        (formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE] && typeof formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE] === 'string'
+            ? (formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE].startsWith('http')
+                ? formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE]
+                : ENVIRONMENT.API_URL + formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE])
+            : null);
+
+    function handleDeleteProfileImage() {
+        setFields({
+            [PROFILE_USER_FIELD_NAMES.URL_IMAGE]: '',
+            [PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW]: null
+        })
+    }
 
     return (
         <div className="profile-page">
@@ -201,15 +212,17 @@ const ProfileScreen = () => {
                     <form className="profile-info" onSubmit={onSubmit}>
                         <div className="profile-avatar-container">
                             <div className="profile-avatar">
-                                {formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW] || currentUserImage ? (
-                                    <img
-                                        src={formState[PROFILE_USER_FIELD_NAMES.URL_IMAGE_PREVIEW] || currentUserImage}
-                                        alt={formState[PROFILE_USER_FIELD_NAMES.NAME]}
-                                        className="profile-avatar__img"
-                                    />
-                                ) : (
-                                    getInitials(user?.name)
-                                )}
+                                <div className="profile-avatar__img-wrapper">
+                                    {displayImage ? (
+                                        <img
+                                            src={displayImage}
+                                            alt={formState[PROFILE_USER_FIELD_NAMES.NAME]}
+                                            className="profile-avatar__img"
+                                        />
+                                    ) : (
+                                        getInitials(user?.name)
+                                    )}
+                                </div>
                                 {isEditing && (
                                     <button
                                         type="button"
@@ -219,6 +232,17 @@ const ProfileScreen = () => {
                                         title="Cambiar foto de perfil"
                                     >
                                         <FaCamera />
+                                    </button>
+                                )}
+                                {isEditing && displayImage && (
+                                    <button
+                                        type="button"
+                                        className="profile-avatar__delete-btn"
+                                        onClick={handleDeleteProfileImage}
+                                        disabled={loading}
+                                        title="Eliminar foto de perfil"
+                                    >
+                                        <MdDelete />
                                     </button>
                                 )}
                             </div>

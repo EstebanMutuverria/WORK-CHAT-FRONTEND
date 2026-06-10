@@ -8,6 +8,7 @@ import DeleteConfirmModal from '../DeleteConfirmModal/DeleteConfirmModal'
 import { updateWorkspace, createWorkspace, deleteWorkspace } from '../../service/workspace.service'
 import ENVIRONMENT from '../../config/environment.config'
 import { FaTrash, FaEdit, FaSave, FaTimes, FaCamera, FaPlus } from 'react-icons/fa'
+import { MdDelete } from 'react-icons/md'
 
 /**
  * WorkspaceFormModal: Maneja la creación, edición y visualización de espacios de trabajo.
@@ -29,7 +30,8 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
         TITLE: 'title',
         DESCRIPTION: 'description',
         IMAGE: 'image',
-        IMAGE_PREVIEW: 'imagePreview'
+        IMAGE_PREVIEW: 'imagePreview',
+        URL_IMAGE: 'url_image'
     }
 
     const {
@@ -44,7 +46,8 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
         [WORKSPACE_FORM_FIELDS.TITLE]: '',
         [WORKSPACE_FORM_FIELDS.DESCRIPTION]: '',
         [WORKSPACE_FORM_FIELDS.IMAGE]: null,
-        [WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW]: null
+        [WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW]: null,
+        [WORKSPACE_FORM_FIELDS.URL_IMAGE]: ''
     }
 
     const {
@@ -71,6 +74,7 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                     title: formState[WORKSPACE_FORM_FIELDS.TITLE],
                     description: formState[WORKSPACE_FORM_FIELDS.DESCRIPTION],
                     image: formState[WORKSPACE_FORM_FIELDS.IMAGE],
+                    url_image: formState[WORKSPACE_FORM_FIELDS.URL_IMAGE]
                 })
             })
         }
@@ -84,7 +88,8 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                     [WORKSPACE_FORM_FIELDS.TITLE]: workspace.workspace_title || '',
                     [WORKSPACE_FORM_FIELDS.DESCRIPTION]: workspace.workspace_description || '',
                     [WORKSPACE_FORM_FIELDS.IMAGE]: null,
-                    [WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW]: null
+                    [WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW]: null,
+                    [WORKSPACE_FORM_FIELDS.URL_IMAGE]: workspace.workspace_image || ''
                 })
                 setIsEditing(mode === 'edit')
             } else {
@@ -105,10 +110,19 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                 [WORKSPACE_FORM_FIELDS.TITLE]: workspace.workspace_title || '',
                 [WORKSPACE_FORM_FIELDS.DESCRIPTION]: workspace.workspace_description || '',
                 [WORKSPACE_FORM_FIELDS.IMAGE]: null,
-                [WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW]: null
+                [WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW]: null,
+                [WORKSPACE_FORM_FIELDS.URL_IMAGE]: workspace.workspace_image || ''
             })
         }
         setIsEditing(!isEditing)
+    }
+
+    function handleDeleteWorkspaceImage() {
+        setFields({
+            [WORKSPACE_FORM_FIELDS.IMAGE]: null,
+            [WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW]: null,
+            [WORKSPACE_FORM_FIELDS.URL_IMAGE]: ''
+        })
     }
 
     // Efecto para manejar el éxito
@@ -135,9 +149,9 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
         }
     }, [response, onRefresh, onClose, mode])
 
-    const currentImage = workspace?.workspace_image?.startsWith('http')
-        ? workspace.workspace_image
-        : workspace?.workspace_image ? ENVIRONMENT.API_URL + workspace.workspace_image : null
+    const currentImage = formState[WORKSPACE_FORM_FIELDS.URL_IMAGE]?.startsWith('http')
+        ? formState[WORKSPACE_FORM_FIELDS.URL_IMAGE]
+        : formState[WORKSPACE_FORM_FIELDS.URL_IMAGE] ? ENVIRONMENT.API_URL + formState[WORKSPACE_FORM_FIELDS.URL_IMAGE] : null
 
     const getInitials = (t) => {
         if (!t) return '?'
@@ -179,8 +193,20 @@ const WorkspaceFormModal = ({ workspace, mode = 'create', isOpen, onClose, onRef
                                         onClick={() => fileInputRef.current.click()}
                                         type="button"
                                         disabled={loading}
+                                        title="Subir imagen"
                                     >
                                         <FaCamera />
+                                    </button>
+                                )}
+                                {isEditing && (formState[WORKSPACE_FORM_FIELDS.IMAGE_PREVIEW] || currentImage) && (
+                                    <button
+                                        className="ws-form__image-delete"
+                                        onClick={handleDeleteWorkspaceImage}
+                                        type="button"
+                                        disabled={loading}
+                                        title="Eliminar imagen"
+                                    >
+                                        <MdDelete />
                                     </button>
                                 )}
                                 <input
